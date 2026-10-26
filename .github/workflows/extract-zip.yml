@@ -1,0 +1,40 @@
+name: Extract project ZIP
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Extract ZIP into repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          ZIP="hayah-mvp-updated.zip"
+          test -f "$ZIP" || { echo "Missing $ZIP in repository root"; exit 1; }
+          mkdir -p /tmp/hayah-extract
+          unzip -q "$ZIP" -d /tmp/hayah-extract
+          mapfile -t entries < <(find /tmp/hayah-extract -mindepth 1 -maxdepth 1 -printf '%f\n' | sort)
+          if [ "${#entries[@]}" -eq 1 ] && [ -d "/tmp/hayah-extract/${entries[0]}" ]; then
+            SRC="/tmp/hayah-extract/${entries[0]}"
+          else
+            SRC="/tmp/hayah-extract"
+          fi
+          rsync -a --exclude='.git' --exclude='hayah-mvp-updated.zip' "$SRC"/ ./
+          git add -A
+          git reset -- hayah-mvp-updated.zip
+          if git diff --cached --quiet; then
+            echo "No extracted changes to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Extract project files from ZIP"
+          git push
