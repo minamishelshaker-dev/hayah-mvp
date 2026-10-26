@@ -8,7 +8,6 @@ import { rateLimited } from '@/lib/ratelimit'
 import type { ActionResult } from '@/lib/types'
 
 const TOO_MANY = 'محاولات كثيرة. انتظر بضع دقائق ثم أعد المحاولة.'
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://hayah-launch.vercel.app'
 
 export async function login(_prev: ActionResult, fd: FormData): Promise<ActionResult> {
   const who = String(fd.get('email') ?? '').trim().toLowerCase()
@@ -40,8 +39,10 @@ export async function register(_prev: ActionResult, fd: FormData): Promise<Actio
   const { data, error } = await (await createClient()).auth.signUp({
     email: v.email,
     password: v.password,
+    // The database ignores this role request: everyone starts as "party" until an admin promotes them.
     options: {
-      emailRedirectTo: `${APP_URL}/auth/callback?next=${encodeURIComponent(safeNext(fd.get('next')))}`,
+      // After clicking the confirmation email the user lands here and gets a session.
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'}/auth/callback?next=${encodeURIComponent(safeNext(fd.get('next')))}`,
       data: { full_name: v.full_name, phone: v.phone, requested_role: v.requested_role, bar_number: v.bar_number },
     },
   })
@@ -54,9 +55,11 @@ export async function requestPasswordReset(_prev: ActionResult, fd: FormData): P
   const email = String(fd.get('email') ?? '').trim()
   if (!z.string().email().safeParse(email).success) return { error: 'البريد الإلكتروني غير صالح' }
   if ((await rateLimited('forgot', 8, 3600)) || (await rateLimited('forgot-email', 3, 3600, email.toLowerCase()))) return { error: TOO_MANY }
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
   await (await createClient()).auth.resetPasswordForEmail(email, {
-    redirectTo: `${APP_URL}/auth/callback?next=${encodeURIComponent('/reset-password')}`,
+    redirectTo: `${base}/auth/callback?next=${encodeURIComponent('/reset-password')}`,
   })
+  // Same answer whether or not the address is registered, so the form cannot be used to probe for accounts.
   return { message: 'إن كان البريد مسجّلًا لدينا فسيصلك رابط لتعيين كلمة مرور جديدة. افتحه من نفس المتصفح الذي طلبت منه.' }
 }
 
