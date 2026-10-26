@@ -27,7 +27,7 @@ jobs:
           else
             SRC="/tmp/hayah-extract"
           fi
-          rsync -a --exclude='.git' --exclude='hayah-mvp-updated.zip' "$SRC"/ ./
+          rsync -a --exclude='.git' --exclude='.github' --exclude='hayah-mvp-updated.zip' "$SRC"/ ./
           git add -A
           git reset -- hayah-mvp-updated.zip
           if git diff --cached --quiet; then
