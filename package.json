@@ -1,0 +1,41 @@
+{
+  "name": "hayah-mvp",
+  "version": "1.0.0",
+  "description": "Hayah ADR Platform - Investor MVP",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "seed": "node --env-file=.env.local scripts/seed-demo.mjs",
+    "test:db": "bash supabase/tests/run.sh",
+    "gen:signing-key": "node scripts/gen-signing-key.mjs",
+    "test:signing": "node scripts/selftest-signing.mjs",
+    "verify:record": "node scripts/verify-record.mjs",
+    "test:filesig": "node --experimental-strip-types scripts/selftest-filesig.mjs",
+    "test:scan": "node --experimental-strip-types scripts/selftest-scan.mjs"
+  },
+  "dependencies": {
+    "@daily-co/daily-js": "^0.94.0",
+    "@fontsource/cairo": "^5.3.0",
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.118.0",
+    "next": "^16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.5.30",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.6.3"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=20.9"
+  }
+}
