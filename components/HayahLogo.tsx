@@ -26,7 +26,7 @@ export default function HayahLogo({
         <span className="hayah-logo__word">Hayah</span>
         <span className="hayah-logo__accent hayah-logo__accent--right" />
       </span>
-      {tagline && <span className="hayah-logo__tagline">ADR PLATFORM</span>}
+      {tagline && <span className="hayah-logo__tagline">Digital Justice</span>}
     </Link>
   )
 }
