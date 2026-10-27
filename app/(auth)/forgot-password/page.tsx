@@ -4,23 +4,26 @@ import Link from 'next/link'
 import { useActionState } from 'react'
 import { requestPasswordReset } from '../actions'
 import SubmitButton from '@/components/SubmitButton'
+import AuthShell from '@/components/AuthShell'
 
 export default function ForgotPasswordPage() {
   const [state, formAction] = useActionState(requestPasswordReset, {})
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4">
-      <Link href="/" className="mb-6 text-2xl font-extrabold">حياة<span className="text-gold">.</span></Link>
-      <form action={formAction} className="panel space-y-4">
-        <h1 className="text-xl">استعادة كلمة المرور</h1>
+    <AuthShell eyebrow="استعادة الوصول" title="استعادة كلمة المرور" description="سنساعدك على استعادة الوصول إلى حسابك باستخدام بريدك الإلكتروني المسجّل.">
+      <form action={formAction} className="auth-form space-y-4">
+        <div className="auth-form-heading">
+          <h2>استعادة حسابك</h2>
+          <p>أدخل البريد الإلكتروني المرتبط بحسابك.</p>
+        </div>
         <div>
           <label className="label" htmlFor="email">البريد الإلكتروني المسجّل</label>
-          <input id="email" name="email" type="email" required autoComplete="email" dir="ltr" className="input" />
+          <input id="email" name="email" type="email" required autoComplete="email" dir="ltr" className="input auth-input" placeholder="name@example.com" />
         </div>
-        {state.error && <p role="alert" className="text-sm font-semibold text-red-700">{state.error}</p>}
-        {state.message && <p role="status" className="text-sm font-semibold text-emerald-700">{state.message}</p>}
-        <SubmitButton label="أرسل رابط الاستعادة" />
-        <p className="hint"><Link className="font-semibold text-gold-700 underline" href="/login">العودة لتسجيل الدخول</Link></p>
+        {state.error && <p role="alert" className="auth-alert auth-alert-error">{state.error}</p>}
+        {state.message && <p role="status" className="auth-alert auth-alert-success">{state.message}</p>}
+        <SubmitButton label="إرسال رابط الاستعادة" className="btn btn-primary auth-submit w-full" />
+        <p className="auth-switch"><Link className="auth-text-link" href="/login">العودة إلى تسجيل الدخول</Link></p>
       </form>
-    </main>
+    </AuthShell>
   )
 }
