@@ -121,3 +121,25 @@
   .app-main { padding:22px 14px 32px; }
   .app-footer-inner { flex-direction:column; gap:4px; }
 }
+
+/* Shared frame for verification, invitation, consent and account-recovery pages. */
+.public-frame { display:flex; min-height:100vh; flex-direction:column; background:#F4F6F9; color:#0D1B2A; }
+.public-frame-header { border-bottom:1px solid #E6EAF0; background:rgba(255,255,255,.96); box-shadow:0 4px 18px rgba(13,27,42,.04); }
+.public-frame-header-inner { display:flex; align-items:center; justify-content:space-between; gap:18px; width:100%; max-width:1200px; min-height:76px; margin:0 auto; padding:12px 24px; }
+.public-frame-brand { display:inline-flex; align-items:center; gap:10px; color:#0D1B2A; text-decoration:none; }
+.public-frame-brand-mark { display:grid; width:38px; height:38px; place-items:center; border-radius:12px; background:#0D1B2A; color:#fff; font-size:1.15rem; font-weight:800; box-shadow:0 5px 14px rgba(13,27,42,.13); }
+.public-frame-brand-name { display:block; font-size:1.25rem; font-weight:800; line-height:1.35; }
+.public-frame-brand-dot { color:#B8860B; }
+.public-frame-brand-caption { display:block; color:#718096; font-size:.72rem; font-weight:600; }
+.public-frame-home { color:#3A4C63; font-size:.86rem; font-weight:700; text-decoration:none; }
+.public-frame-home:hover { color:#946B08; }
+.public-frame-main { flex:1; width:100%; max-width:1200px; margin:0 auto; padding:32px 24px 44px; }
+.public-frame-footer { display:flex; justify-content:space-between; gap:14px; border-top:1px solid #E6EAF0; padding:18px 24px; color:#718096; font-size:.78rem; }
+@media (max-width:600px) {
+  .public-frame-header-inner { min-height:68px; padding:10px 14px; }
+  .public-frame-brand-mark { width:34px; height:34px; }
+  .public-frame-brand-name { font-size:1.12rem; }
+  .public-frame-brand-caption { font-size:.66rem; }
+  .public-frame-main { padding:22px 14px 30px; }
+  .public-frame-footer { flex-direction:column; gap:4px; padding:14px; }
+}
