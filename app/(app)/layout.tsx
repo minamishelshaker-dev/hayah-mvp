@@ -27,7 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="app-shell">
       <header className="app-header print:hidden">
         <div className="app-header-inner">
-          <HayahLogo href="/dashboard" size="sm" variant="default" className="app-header-logo" tagline={false} />
+          <HayahLogo href="/dashboard" size="sm" variant="default" className="app-header-logo" />
           <nav className="app-nav" aria-label="التنقل الرئيسي">
             <NavLink href="/dashboard" currentPath={path}>لوحة التحكم</NavLink>
             {!['mediator', 'arbitrator', 'admin'].includes(profile.role) && (
