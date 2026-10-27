@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import HayahLogo from '@/components/HayahLogo'
 
 const methods = [
   { number: '01', title: 'التفاوض', text: 'مساحة منظمة لعرض وجهات النظر ومحاولة الوصول إلى حل ودي.' },
@@ -19,10 +20,7 @@ export default function Home() {
     <main className="min-h-screen overflow-hidden bg-[#F4F6F9] text-[#0D1B2A]">
       <header className="sticky top-0 z-40 border-b border-[#0D1B2A]/10 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-          <Link href="/" className="flex items-center gap-3" aria-label="حياة - الصفحة الرئيسية">
-            <span className="flex h-[38px] w-[38px] items-center justify-center rounded-xl bg-[#0D1B2A] text-xl font-extrabold text-white">ح</span>
-            <span><span className="block text-xl font-extrabold tracking-tight">حياة</span><span className="block text-xs text-[#3A4C63]">حلول رقمية لتسوية المنازعات</span></span>
-          </Link>
+          <HayahLogo href="/" size="sm" variant="default" className="landing-header-logo" />
           <nav className="hidden items-center gap-7 text-sm font-semibold md:flex">
             <a href="#services" className="transition hover:text-[#0D1B2A]">الخدمات</a>
             <a href="#how-it-works" className="transition hover:text-[#0D1B2A]">كيف تعمل</a>
