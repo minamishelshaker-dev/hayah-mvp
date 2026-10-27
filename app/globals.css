@@ -146,7 +146,6 @@
 
 
 /* Official Hayah ADR wordmark supplied by the project owner. */
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap');
 :root {
   --hayah-gold-deep: #8B6914;
   --hayah-gold-mid: #C6922A;
@@ -210,4 +209,13 @@
   .hayah-logo--sm .hayah-logo__word { font-size:42px; }
   .hayah-logo--sm .hayah-logo__accent { width:6px; height:6px; margin-bottom:10px; }
   .hayah-logo--sm .hayah-logo__tagline { font-size:6px; letter-spacing:3px; }
+}
+
+.auth-header-logo { align-items:center; }
+.public-frame-logo { align-items:center; }
+.app-header-logo { align-items:center; min-width:100px; }
+.landing-header-logo { align-items:center; }
+.auth-brand,.public-frame-brand,.app-brand { display:none !important; }
+@media (max-width:600px) {
+  .app-header-logo { min-width:82px; }
 }
