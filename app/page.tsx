@@ -20,7 +20,7 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-[#0D1B2A]/10 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
           <Link href="/" className="flex items-center gap-3" aria-label="حياة - الصفحة الرئيسية">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0D1B2A] text-xl font-extrabold text-white">ح</span>
+            <span className="flex h-[38px] w-[38px] items-center justify-center rounded-xl bg-[#0D1B2A] text-xl font-extrabold text-white">ح</span>
             <span><span className="block text-xl font-extrabold tracking-tight">حياة</span><span className="block text-xs text-[#3A4C63]">حلول رقمية لتسوية المنازعات</span></span>
           </Link>
           <nav className="hidden items-center gap-7 text-sm font-semibold md:flex">
