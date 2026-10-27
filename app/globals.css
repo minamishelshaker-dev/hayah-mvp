@@ -56,7 +56,7 @@
 .auth-input { min-height:46px; margin-top:3px; border-color:#dce5e9; border-radius:10px; background:#fbfcfd; transition:border-color .18s,box-shadow .18s,background .18s; }
 .auth-input:focus { border-color:var(--auth-teal); background:#fff; --tw-ring-color:rgba(184,134,11,.18); }
 .auth-submit { min-height:48px; margin-top:4px; border-radius:10px; background:var(--auth-ink); box-shadow:0 7px 15px rgba(16,42,67,.12); transition:transform .18s,background .18s,box-shadow .18s; }
-.auth-submit:hover:not(:disabled) { transform:translateY(-1px); background:var(--auth-teal); box-shadow:0 9px 20px rgba(15,118,110,.18); }
+.auth-submit:hover:not(:disabled) { transform:translateY(-1px); background:var(--auth-teal); box-shadow:0 9px 20px rgba(184,134,11,.18); }
 .auth-text-link { color:var(--auth-teal); font-weight:800; text-decoration:none; }
 .auth-switch { padding-top:16px; border-top:1px solid #edf1f3; color:#66798b; font-size:.88rem; text-align:center; }
 .auth-forgot-row { display:flex; justify-content:flex-start; font-size:.86rem; }
