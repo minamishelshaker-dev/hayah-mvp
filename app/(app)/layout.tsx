@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import HayahLogo from '@/components/HayahLogo'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -26,10 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     <div className="app-shell">
       <header className="app-header print:hidden">
         <div className="app-header-inner">
-          <Link href="/dashboard" className="app-brand" aria-label="حياة — لوحة المنصة">
-            <span className="app-brand-mark" aria-hidden="true">ح</span>
-            <span>حياة<span className="app-brand-dot">.</span></span>
-          </Link>
+          <HayahLogo href="/dashboard" size="sm" variant="default" className="app-header-logo" tagline={false} />
           <nav className="app-nav" aria-label="التنقل الرئيسي">
             <NavLink href="/dashboard" currentPath={path}>لوحة التحكم</NavLink>
             {!['mediator', 'arbitrator', 'admin'].includes(profile.role) && (
