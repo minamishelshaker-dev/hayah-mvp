@@ -215,7 +215,6 @@
 .public-frame-logo { align-items:center; }
 .app-header-logo { align-items:center; min-width:100px; }
 .landing-header-logo { align-items:center; }
-.auth-brand,.public-frame-brand,.app-brand { display:none !important; }
 @media (max-width:600px) {
   .app-header-logo { min-width:82px; }
 }
