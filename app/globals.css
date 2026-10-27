@@ -21,20 +21,20 @@
 }
 
 .auth-page {
-  --auth-ink: #102a43;
-  --auth-teal: #0f766e;
-  --auth-gold: #c8a45d;
+  --auth-ink: #0D1B2A;
+  --auth-teal: #946B08;
+  --auth-gold: #B8860B;
   position: relative;
   isolation: isolate;
   min-height: 100vh;
   overflow: hidden;
-  background: radial-gradient(ellipse at 85% 10%, rgba(15,118,110,.12), transparent 36%), linear-gradient(135deg,#f8fafc 0%,#eef4f5 52%,#f7f5ef 100%);
+  background: radial-gradient(ellipse at 85% 10%, rgba(184,134,11,.09), transparent 36%), linear-gradient(135deg,#F4F6F9 0%,#ffffff 52%,#F6EBCB 150%);
   color: var(--auth-ink);
 }
 .auth-layout { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 24px 24px 18px; }
 .auth-glow { position: absolute; z-index: -1; width: 340px; height: 340px; border-radius: 50%; filter: blur(70px); opacity: .35; pointer-events: none; }
-.auth-glow-one { top: 15%; right: -180px; background: #a7d8d0; }
-.auth-glow-two { bottom: -190px; left: -120px; background: #ead9b3; }
+.auth-glow-one { top: 15%; right: -180px; background: #B8860B; }
+.auth-glow-two { bottom: -190px; left: -120px; background: #E6EAF0; }
 .auth-header { display:flex; align-items:center; justify-content:space-between; gap:20px; padding-bottom:20px; border-bottom:1px solid rgba(16,42,67,.1); }
 .auth-brand { display:inline-flex; align-items:center; gap:10px; color:var(--auth-ink); font-size:1.45rem; font-weight:800; text-decoration:none; }
 .auth-brand-mark { display:grid; place-items:center; width:38px; height:38px; border-radius:12px; background:var(--auth-ink); color:#fff; font-size:1.15rem; box-shadow:0 5px 14px rgba(16,42,67,.16); }
@@ -48,15 +48,15 @@
 .auth-intro h1 { margin:18px 0 12px; color:var(--auth-ink); font-size:clamp(2rem,4vw,3.15rem); line-height:1.25; letter-spacing:-.035em; }
 .auth-intro>p { max-width:420px; color:#52677a; font-size:1.02rem; }
 .auth-promise { display:flex; align-items:flex-start; gap:12px; max-width:420px; margin-top:28px; color:#52677a; font-size:.9rem; }
-.auth-promise-icon { display:grid; place-items:center; flex:0 0 26px; height:26px; border:1px solid rgba(15,118,110,.22); border-radius:50%; color:var(--auth-teal); background:rgba(15,118,110,.08); font-weight:800; }
+.auth-promise-icon { display:grid; place-items:center; flex:0 0 26px; height:26px; border:1px solid rgba(184,134,11,.22); border-radius:50%; color:var(--auth-teal); background:rgba(184,134,11,.08); font-weight:800; }
 .auth-form-card { border:1px solid rgba(16,42,67,.09); border-radius:22px; background:rgba(255,255,255,.94); padding:clamp(22px,4vw,34px); box-shadow:0 24px 70px rgba(16,42,67,.1),0 3px 10px rgba(16,42,67,.03); backdrop-filter:blur(10px); }
 .auth-form-heading { margin-bottom:22px; }
 .auth-form-heading h2 { color:var(--auth-ink); font-size:1.25rem; }
 .auth-form-heading p { margin-top:4px; color:#718096; font-size:.87rem; }
 .auth-input { min-height:46px; margin-top:3px; border-color:#dce5e9; border-radius:10px; background:#fbfcfd; transition:border-color .18s,box-shadow .18s,background .18s; }
-.auth-input:focus { border-color:var(--auth-teal); background:#fff; --tw-ring-color:rgba(15,118,110,.18); }
+.auth-input:focus { border-color:var(--auth-teal); background:#fff; --tw-ring-color:rgba(184,134,11,.18); }
 .auth-submit { min-height:48px; margin-top:4px; border-radius:10px; background:var(--auth-ink); box-shadow:0 7px 15px rgba(16,42,67,.12); transition:transform .18s,background .18s,box-shadow .18s; }
-.auth-submit:hover:not(:disabled) { transform:translateY(-1px); background:var(--auth-teal); box-shadow:0 9px 20px rgba(15,118,110,.18); }
+.auth-submit:hover:not(:disabled) { transform:translateY(-1px); background:var(--auth-teal); box-shadow:0 9px 20px rgba(184,134,11,.18); }
 .auth-text-link { color:var(--auth-teal); font-weight:800; text-decoration:none; }
 .auth-switch { padding-top:16px; border-top:1px solid #edf1f3; color:#66798b; font-size:.88rem; text-align:center; }
 .auth-forgot-row { display:flex; justify-content:flex-start; font-size:.86rem; }
@@ -85,3 +85,230 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition:none !important; animation:none !important; scroll-behavior:auto !important; }
 }
+
+
+/* Shared application shell: the same Hayah identity used on every authenticated route. */
+.app-shell { min-height:100vh; background:#F4F6F9; color:#0D1B2A; }
+.app-header { position:sticky; top:0; z-index:30; border-bottom:1px solid #E6EAF0; background:rgba(255,255,255,.96); box-shadow:0 4px 18px rgba(13,27,42,.04); backdrop-filter:blur(12px); }
+.app-header-inner { display:flex; align-items:center; justify-content:space-between; gap:18px; max-width:1200px; min-height:76px; margin:0 auto; padding:12px 24px; }
+.app-brand { display:inline-flex; flex:0 0 auto; align-items:center; gap:10px; color:#0D1B2A; font-size:1.35rem; font-weight:800; text-decoration:none; }
+.app-brand-mark { display:grid; width:38px; height:38px; place-items:center; border-radius:12px; background:#0D1B2A; color:white; box-shadow:0 5px 14px rgba(13,27,42,.13); }
+.app-brand-dot { color:#B8860B; }
+.app-nav { display:flex; flex:1 1 auto; flex-wrap:wrap; align-items:center; gap:5px; }
+.app-nav-link { display:inline-flex; align-items:center; min-height:38px; padding:8px 11px; border-radius:9px; color:#3A4C63; font-size:.88rem; font-weight:700; text-decoration:none; transition:background .18s,color .18s; }
+.app-nav-link:hover { background:#F4F6F9; color:#946B08; }
+.app-nav-link[aria-current="page"] { background:#F6EBCB; color:#0D1B2A; }
+.app-user { display:flex; flex:0 0 auto; align-items:center; gap:10px; color:#3A4C63; font-size:.85rem; }
+.app-user-name { max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }
+.app-main { width:100%; max-width:1200px; min-height:calc(100vh - 150px); margin:0 auto; padding:32px 24px 48px; }
+.app-footer { display:flex; align-items:center; justify-content:space-between; gap:14px; border-top:1px solid #E6EAF0; padding:18px 24px; color:#718096; font-size:.78rem; }
+.app-footer-inner { display:flex; justify-content:space-between; gap:14px; width:100%; max-width:1200px; margin:0 auto; }
+.app-page-title { color:#0D1B2A; letter-spacing:-.02em; }
+@media (max-width: 980px) {
+  .app-header-inner { align-items:flex-start; flex-wrap:wrap; padding:12px 18px; }
+  .app-nav { order:3; flex-basis:100%; }
+  .app-user { margin-inline-start:auto; }
+  .app-main { padding:26px 18px 40px; }
+}
+@media (max-width: 600px) {
+  .app-header-inner { gap:10px; }
+  .app-brand { font-size:1.2rem; }
+  .app-brand-mark { width:34px; height:34px; }
+  .app-nav { gap:2px; }
+  .app-nav-link { min-height:34px; padding:7px 9px; font-size:.8rem; }
+  .app-user { flex-wrap:wrap; justify-content:flex-end; gap:6px; font-size:.78rem; }
+  .app-user-name { max-width:100px; }
+  .app-main { padding:22px 14px 32px; }
+  .app-footer-inner { flex-direction:column; gap:4px; }
+}
+
+/* Shared frame for verification, invitation, consent and account-recovery pages. */
+.public-frame { display:flex; min-height:100vh; flex-direction:column; background:#F4F6F9; color:#0D1B2A; }
+.public-frame-header { border-bottom:1px solid #E6EAF0; background:rgba(255,255,255,.96); box-shadow:0 4px 18px rgba(13,27,42,.04); }
+.public-frame-header-inner { display:flex; align-items:center; justify-content:space-between; gap:18px; width:100%; max-width:1200px; min-height:76px; margin:0 auto; padding:12px 24px; }
+.public-frame-brand { display:inline-flex; align-items:center; gap:10px; color:#0D1B2A; text-decoration:none; }
+.public-frame-brand-mark { display:grid; width:38px; height:38px; place-items:center; border-radius:12px; background:#0D1B2A; color:#fff; font-size:1.15rem; font-weight:800; box-shadow:0 5px 14px rgba(13,27,42,.13); }
+.public-frame-brand-name { display:block; font-size:1.25rem; font-weight:800; line-height:1.35; }
+.public-frame-brand-dot { color:#B8860B; }
+.public-frame-brand-caption { display:block; color:#718096; font-size:.72rem; font-weight:600; }
+.public-frame-home { color:#3A4C63; font-size:.86rem; font-weight:700; text-decoration:none; }
+.public-frame-home:hover { color:#946B08; }
+.public-frame-main { flex:1; width:100%; max-width:1200px; margin:0 auto; padding:32px 24px 44px; }
+.public-frame-footer { display:flex; justify-content:space-between; gap:14px; border-top:1px solid #E6EAF0; padding:18px 24px; color:#718096; font-size:.78rem; }
+@media (max-width:600px) {
+  .public-frame-header-inner { min-height:68px; padding:10px 14px; }
+  .public-frame-brand-mark { width:34px; height:34px; }
+  .public-frame-brand-name { font-size:1.12rem; }
+  .public-frame-brand-caption { font-size:.66rem; }
+  .public-frame-main { padding:22px 14px 30px; }
+  .public-frame-footer { flex-direction:column; gap:4px; padding:14px; }
+}
+
+
+
+
+/* ═══════════════════════════════════════════════
+   HAYAH ADR PLATFORM — Logo CSS Component
+   Ready to copy-paste into your project
+   
+   Usage: Add the Google Font import to your <head>
+   then use the .hayah-logo class anywhere
+   ═══════════════════════════════════════════════ */
+
+/* 1. Add this to your <head> */
+/* <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet"> */
+
+/* ── CSS Variables (change here to restyle everything) ── */
+:root {
+  --hayah-gold-deep:    #8B6914;
+  --hayah-gold-mid:     #C6922A;
+  --hayah-gold-bright:  #E8B84B;
+  --hayah-gold-light:   #F5D06A;
+  --hayah-navy:         #0A1628;
+  --hayah-white:        #FFFFFF;
+
+  --hayah-font-script:  'Great Vibes', cursive;
+  --hayah-font-ui:      'Helvetica Neue', Arial, sans-serif;
+}
+
+/* ══════════════════════════════════════
+   BASE LOGO WRAPPER
+   ══════════════════════════════════════ */
+.hayah-logo {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hayah-logo__wordmark {
+  display: flex;
+  align-items: flex-end;
+  line-height: 1;
+}
+
+/* ══════════════════════════════════════
+   ACCENT SQUARES
+   ══════════════════════════════════════ */
+.hayah-logo__accent {
+  width: 11px;
+  height: 11px;
+  background: var(--hayah-gold-mid);
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-bottom: 18px;
+}
+
+.hayah-logo__accent--left  { margin-right: 6px; }
+.hayah-logo__accent--right { margin-left:  6px; }
+
+/* ══════════════════════════════════════
+   WORDMARK TEXT
+   ══════════════════════════════════════ */
+.hayah-logo__word {
+  font-family: var(--hayah-font-script);
+  font-size: 80px;           /* default size — override with modifier */
+  line-height: 1;
+  letter-spacing: -1px;
+  background: linear-gradient(
+    135deg,
+    var(--hayah-gold-deep)   0%,
+    var(--hayah-gold-mid)    20%,
+    var(--hayah-gold-bright) 40%,
+    var(--hayah-gold-light)  55%,
+    var(--hayah-gold-bright) 70%,
+    var(--hayah-gold-mid)    85%,
+    var(--hayah-gold-deep)   100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0px 1px 6px rgba(198, 146, 42, 0.2));
+  user-select: none;
+}
+
+/* ══════════════════════════════════════
+   TAGLINE
+   ══════════════════════════════════════ */
+.hayah-logo__tagline {
+  font-family: var(--hayah-font-ui);
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--hayah-gold-mid);
+  opacity: 0.65;
+  margin-top: 2px;
+}
+
+/* ══════════════════════════════════════
+   SIZE MODIFIERS
+   ══════════════════════════════════════ */
+
+/* Small — navbar / mobile */
+.hayah-logo--sm .hayah-logo__word         { font-size: 48px; }
+.hayah-logo--sm .hayah-logo__accent       { width: 7px; height: 7px; margin-bottom: 11px; }
+.hayah-logo--sm .hayah-logo__accent--left { margin-right: 4px; }
+.hayah-logo--sm .hayah-logo__accent--right{ margin-left:  4px; }
+.hayah-logo--sm .hayah-logo__tagline      { font-size: 7px; letter-spacing: 4px; }
+
+/* Medium — default header */
+.hayah-logo--md .hayah-logo__word         { font-size: 80px; }
+
+/* Large — hero / landing page */
+.hayah-logo--lg .hayah-logo__word         { font-size: 130px; }
+.hayah-logo--lg .hayah-logo__accent       { width: 14px; height: 14px; margin-bottom: 24px; }
+.hayah-logo--lg .hayah-logo__tagline      { font-size: 11px; letter-spacing: 8px; }
+
+/* XL — splash screen / presentation */
+.hayah-logo--xl .hayah-logo__word         { font-size: 180px; }
+.hayah-logo--xl .hayah-logo__accent       { width: 18px; height: 18px; margin-bottom: 32px; }
+.hayah-logo--xl .hayah-logo__tagline      { font-size: 13px; letter-spacing: 10px; }
+
+/* ══════════════════════════════════════
+   THEME MODIFIERS
+   ══════════════════════════════════════ */
+
+/* Dark background version */
+.hayah-logo--dark {
+  background: var(--hayah-navy);
+  padding: 24px 32px;
+  border-radius: 12px;
+}
+
+.hayah-logo--dark .hayah-logo__word {
+  background: linear-gradient(
+    135deg,
+    var(--hayah-gold-mid)    0%,
+    var(--hayah-gold-bright) 30%,
+    var(--hayah-gold-light)  55%,
+    var(--hayah-gold-bright) 75%,
+    var(--hayah-gold-mid)    100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  filter: drop-shadow(0px 2px 12px rgba(232, 184, 75, 0.35));
+}
+
+.hayah-logo--dark .hayah-logo__accent  { background: var(--hayah-gold-bright); }
+.hayah-logo--dark .hayah-logo__tagline { color: var(--hayah-gold-bright); }
+
+/* Monochrome — single flat gold, no gradient (for printing) */
+.hayah-logo--mono .hayah-logo__word {
+  background: none;
+  -webkit-text-fill-color: var(--hayah-gold-mid);
+  filter: none;
+}
+.hayah-logo--mono .hayah-logo__accent  { background: var(--hayah-gold-mid); }
+.hayah-logo--mono .hayah-logo__tagline { color: var(--hayah-gold-mid); }
+
+/* White version — for dark hero backgrounds without the navy box */
+.hayah-logo--white .hayah-logo__word {
+  background: none;
+  -webkit-text-fill-color: var(--hayah-white);
+  filter: drop-shadow(0px 2px 8px rgba(0,0,0,0.3));
+}
+.hayah-logo--white .hayah-logo__accent  { background: var(--hayah-white); }
+.hayah-logo--white .hayah-logo__tagline { color: var(--hayah-white); opacity: 0.5; }
