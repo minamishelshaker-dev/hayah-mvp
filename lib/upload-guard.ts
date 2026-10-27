@@ -11,7 +11,11 @@ import { scanVerdict, type FetchLike } from '@/lib/scan'
 // Returns an Arabic error message, or null when the file may proceed.
 export async function checkUpload(buf: Buffer, mime: string, fileName: string): Promise<string | null> {
   if (!bytesMatchMime(buf, mime)) return 'محتوى الملف لا يطابق نوعه المعلن. ارفع ملفًا سليمًا من الأنواع المسموحة.'
-  return scanVerdict(new Uint8Array(buf), fileName, process.env, fetch as unknown as FetchLike)
+  return scanVerdict(new Uint8Array(buf), fileName, {
+    MALWARE_SCAN_URL: process.env.MALWARE_SCAN_URL,
+    MALWARE_SCAN_TOKEN: process.env.MALWARE_SCAN_TOKEN,
+    MALWARE_SCAN_REQUIRED: process.env.MALWARE_SCAN_REQUIRED,
+  }, fetch as unknown as FetchLike)
 }
 
 // A rejected upload is already in storage; remove it so unvetted bytes do not linger. Best effort.
