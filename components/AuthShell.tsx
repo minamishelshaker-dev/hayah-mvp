@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import HayahLogo from '@/components/HayahLogo'
 
 export default function AuthShell({ children, eyebrow, title, description }: { children: React.ReactNode; eyebrow: string; title: string; description: string }) {
   return (
@@ -7,10 +8,7 @@ export default function AuthShell({ children, eyebrow, title, description }: { c
       <div className="auth-glow auth-glow-two" aria-hidden="true" />
       <div className="auth-layout">
         <header className="auth-header">
-          <Link href="/" className="auth-brand" aria-label="حياة — الصفحة الرئيسية">
-            <span className="auth-brand-mark" aria-hidden="true">ح</span>
-            <span>حياة<span className="auth-brand-dot">.</span></span>
-          </Link>
+          <HayahLogo href="/" size="sm" variant="default" className="auth-header-logo" />
           <Link href="/" className="auth-home-link">العودة إلى الرئيسية <span aria-hidden="true">←</span></Link>
         </header>
         <div className="auth-content">
