@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import HayahLogo from '@/components/HayahLogo'
+import { BRAND } from '@/lib/brand'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -58,7 +59,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <main className="app-main">{children}</main>
       <footer className="app-footer print:hidden">
         <div className="app-footer-inner">
-          <span>حياة — حلول رقمية لتسوية المنازعات</span>
+          <span>{BRAND.footerLine}</span>
           <span>خصوصيتك وبياناتك محل اهتمامنا</span>
         </div>
       </footer>

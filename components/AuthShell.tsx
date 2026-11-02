@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import HayahLogo from '@/components/HayahLogo'
+import { BRAND } from '@/lib/brand'
 
 export default function AuthShell({ children, eyebrow, title, description }: { children: React.ReactNode; eyebrow: string; title: string; description: string }) {
   return (
@@ -26,7 +27,7 @@ export default function AuthShell({ children, eyebrow, title, description }: { c
           </section>
         </div>
         <footer className="auth-footer">
-          <span>حياة — حلول رقمية لتسوية المنازعات</span>
+          <span>{BRAND.footerLine}</span>
           <span>خصوصيتك وبياناتك محل اهتمامنا</span>
         </footer>
       </div>

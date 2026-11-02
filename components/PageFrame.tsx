@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import HayahLogo from '@/components/HayahLogo'
+import { BRAND } from '@/lib/brand'
 
 export default function PageFrame({ children, homeHref = '/', homeLabel = 'الصفحة الرئيسية' }: {
   children: React.ReactNode
@@ -16,7 +17,7 @@ export default function PageFrame({ children, homeHref = '/', homeLabel = 'ال�
       </header>
       <main className="public-frame-main">{children}</main>
       <footer className="public-frame-footer">
-        <span>حياة — حلول رقمية لتسوية المنازعات</span>
+        <span>{BRAND.footerLine}</span>
         <span>خصوصيتك وبياناتك محل اهتمامنا</span>
       </footer>
     </div>
