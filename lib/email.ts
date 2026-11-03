@@ -1,3 +1,4 @@
+import { smtpSend } from '@/lib/smtp'
 import { BRAND } from '@/lib/brand'
 
 const appUrl = () => (process.env.NEXT_PUBLIC_APP_URL ?? 'https://hayah-launch.vercel.app').replace(/\/$/, '')
@@ -19,64 +20,80 @@ export function brandEmail(inner: string): string {
 
 export const esc = (v: string) => v.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string))
 
-// Optional: sends the invitation email through Resend's REST API when RESEND_API_KEY is set.
-export async function sendInvitationEmail(to: string, claimantName: string, disputeNumber: string, link: string) {
-  const key = process.env.RESEND_API_KEY
-  if (!key) return false
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: process.env.RESEND_FROM ?? 'Hayah <onboarding@resend.dev>',
-      to,
-      subject: `دعوة إلى وساطة — ${disputeNumber}`,
-      html: brandEmail(`
-        <p>تمت دعوتك من ${esc(claimantName)} إلى جلسات وساطة إلكترونية على منصة حياة (النزاع ${esc(disputeNumber)}).</p>
-        <p>الوساطة اختيارية وسرّية. يمكنك الاطلاع على الدعوة وقبولها من الرابط:</p>
-        <p><a href="${esc(link)}">${esc(link)}</a></p><p>صلاحية الرابط 7 أيام.</p>`),
-    }),
-  })
-  return res.ok
-}
+// Mail goes out through ONE of two providers, chosen by configuration:
+//  1) SMTP  (SMTP_HOST, SMTP_USER, SMTP_PASS, optional SMTP_PORT = 465 and MAIL_FROM). Works with a Gmail account + app password and needs
+//     no verified domain, so the platform can write to ANY recipient (the second party included).
+//  2) Resend (RESEND_API_KEY, RESEND_FROM). With the default onboarding@resend.dev sender Resend delivers ONLY to the account owner's own
+//     address: every other recipient is rejected, which is why invitations never reached the second party. Verify a domain in Resend to fix that.
+export type MailResult = { ok: true; via: 'smtp' | 'resend' } | { ok: false; reason: string }
 
-// Daily anchor: the hash of the newest audit row, mailed outside the database.
-export async function sendAnchorEmail(to: string, head: { seq: number; row_hash: string; at: string }) {
-  const key = process.env.RESEND_API_KEY
-  if (!key) return false
-  const res = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: process.env.RESEND_FROM ?? 'Hayah <onboarding@resend.dev>',
-      to,
-      subject: `نقطة تحقق سجل حياة — الحدث ${head.seq}`,
-      html: brandEmail(`
-        <p>احتفظ بهذه الرسالة خارج المنصة. تُستخدم لاكتشاف إعادة كتابة السجل لاحقًا.</p>
-        <p>رقم آخر حدث: <b dir="ltr">${head.seq}</b></p>
-        <p>البصمة: <code dir="ltr">${head.row_hash}</code></p>
-        <p>وقت الحدث: ${head.at}</p>`),
-    }),
-  })
-  return res.ok
+const smtpConfig = () => {
+  const { SMTP_HOST: host, SMTP_USER: user, SMTP_PASS: pass } = process.env
+  return host && user && pass ? { host, user, pass, port: Number(process.env.SMTP_PORT) || 465 } : null
 }
+export const mailConfigured = () => Boolean(smtpConfig() || process.env.RESEND_API_KEY)
+const fromAddress = () => process.env.MAIL_FROM ?? process.env.RESEND_FROM ?? (smtpConfig() ? `Hayah <${process.env.SMTP_USER}>` : 'Hayah <onboarding@resend.dev>')
 
-// Generic RTL mail. Best-effort: returns false (never throws) when Resend is not configured.
-export async function sendMail(to: string, subject: string, htmlBody: string): Promise<boolean> {
+// Never throws. Failures are written to the runtime logs (no message content, no secrets) so they can be diagnosed.
+async function deliver(to: string, subject: string, html: string): Promise<MailResult> {
+  const domain = to.split('@')[1] ?? '?'
+  const smtp = smtpConfig()
+  if (smtp) {
+    try {
+      await smtpSend(smtp, { from: fromAddress(), to, subject, html })
+      return { ok: true, via: 'smtp' }
+    } catch (e) {
+      const reason = e instanceof Error ? e.message : 'SMTP error'
+      console.error(JSON.stringify({ level: 'error', what: 'mail-send-failed', via: 'smtp', toDomain: domain, reason: reason.slice(0, 200) }))
+      return { ok: false, reason }
+    }
+  }
   const key = process.env.RESEND_API_KEY
-  if (!key) return false
+  if (!key) return { ok: false, reason: 'no mail provider configured (set SMTP_* or RESEND_API_KEY)' }
   try {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        from: process.env.RESEND_FROM ?? 'Hayah <onboarding@resend.dev>',
-        to,
-        subject,
-        html: brandEmail(`${htmlBody}`),
-      }),
+      body: JSON.stringify({ from: fromAddress(), to, subject, html }),
     })
-    return res.ok
-  } catch {
-    return false
+    if (res.ok) return { ok: true, via: 'resend' }
+    const detail = (await res.text()).replace(/\s+/g, ' ').slice(0, 200)
+    console.error(JSON.stringify({ level: 'error', what: 'mail-send-failed', via: 'resend', status: res.status, toDomain: domain, detail }))
+    return { ok: false, reason: `resend ${res.status}: ${detail}` }
+  } catch (e) {
+    const reason = e instanceof Error ? e.message : 'network error'
+    console.error(JSON.stringify({ level: 'error', what: 'mail-send-failed', via: 'resend', toDomain: domain, reason }))
+    return { ok: false, reason }
   }
+}
+
+const wrap = (inner: string) => brandEmail(inner)
+
+// The invitation goes to the SECOND party's address (`to`), never to the claimant.
+export async function sendInvitationEmail(to: string, claimantName: string, disputeNumber: string, link: string): Promise<MailResult> {
+  return deliver(
+    to,
+    `دعوة إلى وساطة — ${disputeNumber}`,
+    wrap(`<p>تمت دعوتك من ${esc(claimantName)} إلى جلسات وساطة إلكترونية على منصة حياة (النزاع ${esc(disputeNumber)}).</p>
+        <p>الوساطة اختيارية وسرّية. يمكنك الاطلاع على الدعوة وقبولها من الرابط (سجّل الدخول أو أنشئ حسابًا بهذا البريد نفسه):</p>
+        <p><a href="${esc(link)}">${esc(link)}</a></p><p>صلاحية الرابط 7 أيام.</p>`)
+  )
+}
+
+// Daily anchor: the hash of the newest audit row, mailed outside the database.
+export async function sendAnchorEmail(to: string, head: { seq: number; row_hash: string; at: string }): Promise<boolean> {
+  const r = await deliver(
+    to,
+    `نقطة تحقق سجل حياة — الحدث ${head.seq}`,
+    wrap(`<p>احتفظ بهذه الرسالة خارج المنصة. تُستخدم لاكتشاف إعادة كتابة السجل لاحقًا.</p>
+        <p>رقم آخر حدث: <b dir="ltr">${head.seq}</b></p>
+        <p>البصمة: <code dir="ltr">${head.row_hash}</code></p>
+        <p>وقت الحدث: ${head.at}</p>`)
+  )
+  return r.ok
+}
+
+// Generic RTL mail. Best-effort: returns false (never throws) when no provider is configured or sending fails.
+export async function sendMail(to: string, subject: string, htmlBody: string): Promise<boolean> {
+  return (await deliver(to, subject, wrap(htmlBody))).ok
 }

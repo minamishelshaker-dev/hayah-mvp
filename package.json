@@ -13,7 +13,8 @@
     "test:signing": "node scripts/selftest-signing.mjs",
     "verify:record": "node scripts/verify-record.mjs",
     "test:filesig": "node --experimental-strip-types scripts/selftest-filesig.mjs",
-    "test:scan": "node --experimental-strip-types scripts/selftest-scan.mjs"
+    "test:scan": "node --experimental-strip-types scripts/selftest-scan.mjs",
+    "test:smtp": "node --experimental-strip-types scripts/selftest-smtp.mjs"
   },
   "dependencies": {
     "@daily-co/daily-js": "^0.94.0",

@@ -336,3 +336,22 @@ export async function terminateArbitration(arbId: string, fd: FormData): Promise
   revalidatePath(`/arbitrations/${arbId}`)
   return { message: 'أُنهيت الإجراءات وسُجّلت النتيجة.' }
 }
+
+// ------------------------------------------------------------------ challenging the arbitrator (a right the rules cannot waive)
+export async function challengeArbitrator(arbId: string, fd: FormData): Promise<ActionResult> {
+  const { error } = await (await createClient()).rpc('challenge_arbitrator', { p_arb: arbId, p_grounds: text(fd, 'grounds') })
+  if (error) return { error: error.message }
+  await notifyArbitration(arbId, 'challenge_filed', { roles: ['arbitrator'] })
+  revalidatePath(`/arbitrations/${arbId}`)
+  return { message: 'قُدِّم طلب الرد إلى المحكّم ويظهر للطرفين.' }
+}
+
+// accept = true: the arbitrator steps down and the file returns to arbitrator selection.
+// accept = false: the request is rejected with reasons; the party's remedy before the competent court is outside the platform.
+export async function decideChallenge(arbId: string, challengeId: string, accept: boolean, fd: FormData): Promise<ActionResult> {
+  const { error } = await (await createClient()).rpc('decide_challenge', { p_challenge: challengeId, p_accept: accept, p_reasons: text(fd, 'reasons') })
+  if (error) return { error: error.message }
+  await notifyArbitration(arbId, 'challenge_decided', { roles: ['claimant', 'respondent'] })
+  revalidatePath(`/arbitrations/${arbId}`)
+  return { message: accept ? 'تنحّيت وعاد الملف إلى اختيار المحكّم.' : 'سُجّل رفض الطلب بأسبابه.' }
+}

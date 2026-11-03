@@ -23,11 +23,21 @@ const ASSIGNMENT_LABEL: Record<string, string> = {
   ended: 'انسحب من الملف',
 }
 
-export function InvitationPanel({ disputeId, link, email, expiresAt }: { disputeId: string; link: string; email: string; expiresAt: string }) {
+export function InvitationPanel({ disputeId, link, email, expiresAt, mailStatus }: { disputeId: string; link: string; email: string; expiresAt: string; mailStatus?: 'sent' | 'failed' }) {
   const expired = new Date(expiresAt).getTime() < Date.now()
   return (
     <section className="panel space-y-3 border-gold">
       <h2 className="text-lg">دعوة الطرف الثاني</h2>
+      {mailStatus === 'sent' && (
+        <p role="status" className="rounded bg-green-50 p-2 text-sm font-semibold text-green-800">
+          أرسلت المنصة الدعوة تلقائيًا إلى <span dir="ltr">{email}</span>. لا حاجة لإرسال أي شيء بنفسك؛ الرابط أدناه احتياطي فقط.
+        </p>
+      )}
+      {mailStatus === 'failed' && (
+        <p role="alert" className="rounded bg-red-50 p-2 text-sm font-semibold text-red-800">
+          تعذّر على المنصة إرسال بريد الدعوة تلقائيًا (راجع إعداد البريد في لوحة المقاييس). أرسل الرابط أدناه للطرف الثاني مباشرة.
+        </p>
+      )}
       {expired ? (
         <p role="alert" className="rounded bg-red-50 p-2 text-sm font-semibold text-red-800">انتهت صلاحية الدعوة. أصدر رابطًا جديدًا أدناه أو اسحب النزاع من قسم الإنهاء.</p>
       ) : (

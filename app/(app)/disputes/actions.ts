@@ -55,12 +55,10 @@ export async function createDispute(_prev: ActionResult, fd: FormData): Promise<
   const { data: { user } } = await supabase.auth.getUser()
   const { data: me } = await supabase.from('profiles').select('full_name').eq('id', user?.id ?? '').maybeSingle()
   const base = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  try {
-    await sendInvitationEmail(v.respondent_email, me?.full_name ?? 'أحد الأطراف', dispute_number, `${base}/invite/${token}`)
-  } catch {
-    // The invitation link is also shown on the dispute page, so a mail failure is not fatal.
-  }
-  redirect(`/disputes/${id}`)
+  // The PLATFORM mails the invitation to the second party. The result is reported to the claimant (never ignored); the link stays on
+  // the page as a fallback, so a mail failure is not fatal.
+  const mail = await sendInvitationEmail(v.respondent_email, me?.full_name ?? 'أحد الأطراف', dispute_number, `${base}/invite/${token}`)
+  redirect(`/disputes/${id}?invite=${mail.ok ? 'sent' : 'failed'}`)
 }
 
 export async function acceptInvitation(token: string, _fd?: FormData): Promise<ActionResult> {
@@ -299,12 +297,9 @@ export async function resendInvitation(disputeId: string, fd: FormData): Promise
   const { data: { user } } = await supabase.auth.getUser()
   const { data: me } = await supabase.from('profiles').select('full_name').eq('id', user?.id ?? '').maybeSingle()
   const base = process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'
-  let sent = false
-  try {
-    sent = await sendInvitationEmail(email, me?.full_name ?? 'أحد الأطراف', gate?.dispute_number ?? '', `${base}/invite/${token}`)
-  } catch { /* the link is shown on the page anyway */ }
+  const mail = await sendInvitationEmail(email, me?.full_name ?? 'أحد الأطراف', gate?.dispute_number ?? '', `${base}/invite/${token}`)
   revalidatePath(`/disputes/${disputeId}`)
-  return { message: sent ? `أُرسل رابط جديد إلى ${email}.` : 'صدر رابط جديد. انسخه من أعلى الصفحة وأرسله للطرف الثاني.' }
+  return { message: mail.ok ? `أرسلت المنصة رابطًا جديدًا إلى ${email}.` : 'صدر رابط جديد لكن تعذّر إرسال البريد تلقائيًا. انسخه من أعلى الصفحة وأرسله للطرف الثاني.' }
 }
 
 export async function reopenSettlement(disputeId: string, fd: FormData): Promise<ActionResult> {

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { mailConfigured } from '@/lib/email'
 import { formatDuration } from '@/lib/utils'
 import { formatEgp } from '@/lib/labels'
 
@@ -30,9 +31,10 @@ export default async function MetricsPage() {
     { ok: m.placeholder_docs === 0, text: 'النصوص القانونية المعتمدة منشورة (لا نصوص مؤقتة)' },
     { ok: m.verified_mediators >= 2, text: `وسيطان معتمدان على الأقل (الحالي: ${num(m.verified_mediators)})` },
     { ok: Boolean(process.env.DAILY_API_KEY), text: 'مفتاح Daily.co مضبوط (فيديو حقيقي)' },
-    { ok: Boolean(process.env.RESEND_API_KEY), text: 'مفتاح Resend مضبوط (بريد الدعوات)' },
+    { ok: mailConfigured(), text: 'مزوّد البريد مضبوط (SMTP أو Resend): تصل الدعوة إلى الطرف الثاني تلقائيًا' },
+    { ok: Boolean(process.env.SMTP_HOST) || Boolean(process.env.RESEND_FROM && !process.env.RESEND_FROM.includes('resend.dev')), text: 'مرسِل لا يقتصر على بريد صاحب الحساب (SMTP، أو نطاق موثَّق في Resend)' },
     { ok: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY), text: 'مفتاح خدمة Supabase مضبوط (مطلوب لتسجيل المستندات والتوقيع وقبول الاتفاقيات وغرف الفيديو)' },
-    { ok: Boolean(process.env.CRON_SECRET && process.env.ANCHOR_EMAIL && process.env.RESEND_API_KEY), text: 'نقطة التحقق اليومية للسجل مضبوطة (CRON_SECRET وANCHOR_EMAIL)' },
+    { ok: Boolean(process.env.CRON_SECRET && process.env.ANCHOR_EMAIL && mailConfigured()), text: 'نقطة التحقق اليومية للسجل مضبوطة (CRON_SECRET وANCHOR_EMAIL)' },
     { ok: !(process.env.NEXT_PUBLIC_APP_URL ?? 'localhost').includes('localhost'), text: 'رابط الموقع الفعلي مضبوط في NEXT_PUBLIC_APP_URL' },
   ]
 

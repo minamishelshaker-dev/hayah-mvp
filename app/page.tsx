@@ -97,7 +97,7 @@ export default function Home() {
       <footer className="border-t border-[#E6EAF0] bg-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-[#3A4C63] sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <div className="flex flex-col items-start gap-1"><HayahLogo href="/" size="sm" variant="default" /><p>{BRAND.footerLine}</p></div>
-          <p className="max-w-2xl leading-6">تنبيه: المنصة أداة لإدارة الإجراءات وتوثيقها وليست جهة قضائية أو جهة تحكيم. يجب مراجعة النصوص القانونية والإجراءات قبل أي استخدام فعلي.</p>
+          <p className="max-w-2xl leading-6">تنبيه: المنصة أداة لإدارة الإجراءات وتوثيقها وليست جهة قضائية أو جهة تحكيم. التوقيع الإلكتروني فيها بسيط وليس معتمدًا من هيئة تنمية صناعة تكنولوجيا المعلومات (ITIDA)، وقبول المحكمة المختصة له غير محسوم قانونيًا. وهذه نسخة تجريبية، ويجب مراجعة النصوص القانونية والإجراءات قبل أي استخدام فعلي.</p>
           <Link href="/login" className="font-bold text-[#0A1628] hover:underline">تسجيل الدخول</Link>
         </div>
       </footer>
