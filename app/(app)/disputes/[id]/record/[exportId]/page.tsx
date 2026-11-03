@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import PrintButton from '@/components/PrintButton'
 import { DOC_TYPE_LABEL, OUTCOME_LABEL, STATUS_LABEL, TYPE_LABEL, describeEvent, formatDate, formatEgp, formatSize } from '@/lib/labels'
 import type { RecordEnvelope } from '@/lib/types'
+import DocumentHeader from '@/components/DocumentHeader'
 
 const ROLE_AR: Record<string, string> = { claimant: 'مقدّم النزاع', respondent: 'الطرف الثاني' }
 const H2 = 'mb-2 border-b border-navy-100 pb-1 text-lg'
@@ -31,9 +32,9 @@ export default async function RecordViewPage(props: { params: Promise<{ id: stri
       </div>
 
       <article className="space-y-6 rounded-lg border border-navy-100 bg-white p-6 text-sm leading-7 print:rounded-none print:border-0 print:p-0">
+        <DocumentHeader />
         <header className="border-b-2 border-gold pb-3">
-          <p className="text-xl font-extrabold">حياة<span className="text-gold">.</span></p>
-          <h1 className="text-2xl">محضر موثّق لملف وساطة</h1>
+                    <h1 className="text-2xl">محضر موثّق لملف وساطة</h1>
           <p>
             النزاع <span dir="ltr" className="font-semibold">{r.dispute.number}</span> — صدر في {formatDate(rec.issued_at)} عن {rec.issued_by.name}
           </p>
