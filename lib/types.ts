@@ -156,6 +156,10 @@ export interface ArbAward {
   signing_mode: 'paper' | 'platform' | null; signed_at: string | null; signer_aal: string | null
   platform_signature: string | null; signing_key_id: string | null
 }
+export interface ArbChallenge {
+  id: string; arbitrator_id: string; challenger_id: string; body: string; status: 'pending' | 'accepted' | 'rejected'
+  response_body: string | null; decided_at: string | null; created_at: string
+}
 export interface ArbAgreement {
   id: string; body: string; body_hash: string; version: number; status: 'draft' | 'open' | 'signed'
   opened_at: string | null; signed_at: string | null; platform_signature: string | null; signing_key_id: string | null

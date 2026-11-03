@@ -12,9 +12,9 @@ import {
   acceptArbRules, arbitratorRespond, arbitratorWithdraw, closeProceedings, confirmArbAgreement, extendStep, issueAward,
   openArbAgreement, partyRespondArbitrator, proposeArbitrator, reopenArbAgreement, respondEscalation, retryArbAttestation,
   saveAwardDraft, saveArbAgreement, scheduleHearing, setStep, signArbAgreement, signAward,
-  submitStatement, terminateArbitration, withdrawArbitration,
+  submitStatement, terminateArbitration, withdrawArbitration, challengeArbitrator, decideChallenge,
 } from '@/app/(app)/arbitrations/actions'
-import type { ArbAgreement, ArbAssignment, ArbAward, ArbDocument, ArbHearing, ArbStep, ArbSubmission, Arbitration } from '@/lib/types'
+import type { ArbAgreement, ArbAssignment, ArbAward, ArbChallenge, ArbDocument, ArbHearing, ArbStep, ArbSubmission, Arbitration } from '@/lib/types'
 
 type Names = Record<string, string>
 export type Neutral = { id: string; name: string; bio: string | null; specializations: string[]; years_experience: number | null }
@@ -334,6 +334,58 @@ export function SelectionPanel({ arb, assignments, directory, names, viewerId, i
             </div>
           ))}
         </div>
+      )}
+    </section>
+  )
+}
+
+// ------------------------------------------------------------------ challenging the arbitrator
+// A party may challenge the arbitrator under the law; the platform only records the request and the arbitrator's reasoned decision.
+export function ChallengePanel({ arb, challenges, names, isParty, isArbitrator }: {
+  arb: Arbitration; challenges: ArbChallenge[]; names: Names; isParty: boolean; isArbitrator: boolean
+}) {
+  const open = !!arb.arbitrator_id && ['active', 'deliberation'].includes(arb.status)
+  const pending = challenges.find((c) => c.status === 'pending')
+  if (!challenges.length && !(open && isParty)) return null
+  const label = { pending: 'قيد النظر', accepted: 'قُبل (تنحّى المحكّم)', rejected: 'رُفض بقرار مسبَّب' } as const
+  return (
+    <section className="panel space-y-3">
+      <h2 className="text-lg">رد المحكّم</h2>
+      <p className="hint">
+        من حق كل طرف طلب رد المحكّم وفق القانون عند وجود ما يثير شكوكًا جدية في حياده أو استقلاله. يُقدَّم الطلب إلى المحكّم ويبتّ فيه بقرار مسبَّب.
+        إن قبله تنحّى وعاد الملف إلى اختيار محكّم جديد. وإن رفضه فسبيل الطرف أمام المحكمة المختصة وفق القانون، وهو خارج المنصة.
+      </p>
+      {challenges.length > 0 && (
+        <ul className="divide-y divide-navy-100">
+          {challenges.map((c) => (
+            <li key={c.id} className="space-y-2 py-3">
+              <p className="font-semibold">طلب من {nm(names, c.challenger_id)} — {label[c.status]} <span className="hint">({formatDate(c.created_at)})</span></p>
+              <p className="whitespace-pre-wrap rounded-md border border-navy-100 bg-navy-50 p-3 text-sm leading-7">{c.body}</p>
+              {c.response_body && <p className="whitespace-pre-wrap rounded-md border border-navy-100 p-3 text-sm leading-7"><b>قرار المحكّم:</b> {c.response_body}</p>}
+              {isArbitrator && c.status === 'pending' && (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <FormAction action={decideChallenge.bind(null, arb.id, c.id, true)} submitLabel="أقبل الطلب وأتنحّى" variant="gold" className="space-y-2"
+                    confirmText="ستتنحّى ويعود الملف إلى اختيار المحكّم. هل أنت متأكد؟">
+                    <label className="label" htmlFor={`acc-${c.id}`}>أسباب قرارك (20 حرفًا على الأقل)</label>
+                    <textarea id={`acc-${c.id}`} name="reasons" rows={3} required minLength={20} className="input" />
+                  </FormAction>
+                  <FormAction action={decideChallenge.bind(null, arb.id, c.id, false)} submitLabel="أرفض الطلب" variant="ghost" className="space-y-2"
+                    confirmText="سيُسجَّل رفضك بأسبابه ويظهر للطرفين. هل أنت متأكد؟">
+                    <label className="label" htmlFor={`rej-${c.id}`}>أسباب قرارك (20 حرفًا على الأقل)</label>
+                    <textarea id={`rej-${c.id}`} name="reasons" rows={3} required minLength={20} className="input" />
+                  </FormAction>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {open && isParty && !pending && (
+        <FormAction action={challengeArbitrator.bind(null, arb.id)} submitLabel="تقديم طلب رد المحكّم" variant="ghost" className="space-y-2 border-t border-navy-100 pt-3"
+          confirmText="سيُرسل الطلب إلى المحكّم ويظهر للطرف الآخر. هل أنت متأكد؟">
+          <label className="label" htmlFor="grounds">أسباب طلب الرد (30 حرفًا على الأقل)</label>
+          <textarea id="grounds" name="grounds" rows={4} required minLength={30} className="input" />
+        </FormAction>
       )}
     </section>
   )

@@ -18,8 +18,10 @@ const STEP_INDEX: Record<string, number> = {
   invited: 0, accepted: 1, mediator_selection: 1, active: 2, settlement_draft: 3, signed: 4, closed: 4, cancelled: 0,
 }
 
-export default async function DisputePage(props: { params: Promise<{ id: string }> }) {
+export default async function DisputePage(props: { params: Promise<{ id: string }>; searchParams: Promise<{ invite?: string }> }) {
   const params = await props.params
+  const { invite } = await props.searchParams
+  const mailStatus = invite === 'sent' || invite === 'failed' ? invite : undefined
   const profile = await requireProfile()
   const supabase = await createClient()
 
@@ -125,7 +127,7 @@ export default async function DisputePage(props: { params: Promise<{ id: string 
       <EndedBanner dispute={d} />
 
       {d.status === 'invited' && isClaimant && inviteQ.data && (
-        <InvitationPanel disputeId={d.id} email={inviteQ.data.invited_email} expiresAt={inviteQ.data.expires_at} link={`${base}/invite/${inviteQ.data.token}`} />
+        <InvitationPanel disputeId={d.id} email={inviteQ.data.invited_email} expiresAt={inviteQ.data.expires_at} link={`${base}/invite/${inviteQ.data.token}`} mailStatus={mailStatus} />
       )}
 
       {d.status !== 'invited' && (

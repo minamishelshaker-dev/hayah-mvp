@@ -1,5 +1,5 @@
 import { createAdminClient } from '@/lib/supabase/admin'
-import { esc, sendMail } from '@/lib/email'
+import { esc, mailConfigured, sendMail } from '@/lib/email'
 
 export type NotifyEvent =
   | 'respondent_accepted' | 'mediator_proposed' | 'proposal_approved' | 'mediator_accepted' | 'mediator_declined'
@@ -30,7 +30,7 @@ export async function notifyDispute(
   opts: { roles?: Role[]; except?: string; mediatorOfAssignment?: string } = {}
 ): Promise<void> {
   try {
-    if (!process.env.RESEND_API_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY) return
+    if (!mailConfigured() || !process.env.SUPABASE_SERVICE_ROLE_KEY) return
     const admin = createAdminClient()
     const { data: d } = await admin
       .from('disputes').select('dispute_number, claimant_id, respondent_id, mediator_id').eq('id', disputeId).maybeSingle()
@@ -67,7 +67,7 @@ export async function notifyIfSettlementSigned(disputeId: string): Promise<void>
 
 export async function notifyUserEmail(userId: string, subject: string, htmlBody: string): Promise<void> {
   try {
-    if (!process.env.RESEND_API_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY) return
+    if (!mailConfigured() || !process.env.SUPABASE_SERVICE_ROLE_KEY) return
     const { data } = await createAdminClient().from('profiles').select('email').eq('id', userId).maybeSingle()
     if (data?.email) await sendMail(data.email, subject, htmlBody)
   } catch {
@@ -79,7 +79,7 @@ export type ArbNotifyEvent =
   | 'escalation_proposed' | 'escalation_answered' | 'agreement_confirmed' | 'arbitrator_proposed' | 'arbitrator_approved'
   | 'arbitrator_seated' | 'arbitrator_declined' | 'step_set' | 'statement_submitted' | 'hearing_scheduled'
   | 'proceedings_closed' | 'award_issued' | 'arbitration_ended' | 'arbitrator_withdrew'
-  | 'agreement_opened' | 'agreement_signed'
+  | 'agreement_opened' | 'agreement_signed' | 'challenge_filed' | 'challenge_decided'
 
 const ARB_MESSAGES: Record<ArbNotifyEvent, string> = {
   escalation_proposed: 'طُلب تصعيد النزاع إلى التحكيم ويحتاج ردّك.',
@@ -96,6 +96,8 @@ const ARB_MESSAGES: Record<ArbNotifyEvent, string> = {
   award_issued: 'سُجِّل صدور حكم التحكيم. اطّلع عليه في المنصة.',
   arbitration_ended: 'انتهى ملف التحكيم. اطّلع على نتيجته في المنصة.',
   arbitrator_withdrew: 'انسحب المحكّم من الملف ويلزم اختيار محكّم آخر.',
+  challenge_filed: 'قُدِّم طلب رد المحكّم في ملف التحكيم ويحتاج قرارًا مسبَّبًا.',
+  challenge_decided: 'بتَّ المحكّم في طلب رده. راجع القرار وأسبابه في الملف.',
   agreement_opened: 'فُتح نص اتفاق التحكيم للتوقيع على المنصة ويحتاج قراءتك وتوقيعك.',
   agreement_signed: 'وقّع الطرف الآخر اتفاق التحكيم على المنصة. إن لم توقّع بعد فاطّلع عليه ووقّع.',
 }
@@ -106,7 +108,7 @@ export async function notifyArbitration(
   opts: { roles?: ('claimant' | 'respondent' | 'arbitrator')[]; except?: string; arbitratorOfAssignment?: string } = {}
 ): Promise<void> {
   try {
-    if (!process.env.RESEND_API_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY) return
+    if (!mailConfigured() || !process.env.SUPABASE_SERVICE_ROLE_KEY) return
     const admin = createAdminClient()
     const { data: a } = await admin.from('arbitrations').select('arb_number, claimant_id, respondent_id, arbitrator_id').eq('id', arbId).maybeSingle()
     if (!a) return

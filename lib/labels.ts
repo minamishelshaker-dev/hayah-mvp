@@ -145,6 +145,10 @@ export function describeEvent(log: Pick<AuditLog, 'event_type' | 'new_state' | '
       return n.status !== o.status
         ? `تغيّرت حالة التحكيم إلى «${ARB_STATUS_LABEL[n.status] ?? n.status}»${n.outcome ? ` — ${ARB_OUTCOME_LABEL[n.outcome] ?? n.outcome}` : ''}`
         : 'تحديث بيانات التحكيم'
+    case 'arb_challenges.INSERT':
+      return 'تقديم طلب رد المحكّم'
+    case 'arb_challenges.UPDATE':
+      return n.status === 'accepted' ? 'قبول المحكّم طلب الرد وتنحّيه' : n.status === 'rejected' ? 'رفض المحكّم طلب الرد بقرار مسبَّب' : 'تحديث طلب الرد'
     case 'arb_assignments.INSERT':
       return 'اقتراح محكّم'
     case 'arb_assignments.UPDATE':

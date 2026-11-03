@@ -4,10 +4,10 @@ import { requireProfile } from '@/lib/auth'
 import Timeline from '@/components/dispute/Timeline'
 import { arbAgreementTemplate } from '@/lib/arb-agreement-template'
 import {
-  AgreementPanel, ArbDocumentsPanel, ArbGate, ArbHeader, ArbLifecycle, AwardPanel, EndedNotice,
+  AgreementPanel, ArbDocumentsPanel, ArbGate, ArbHeader, ArbLifecycle, AwardPanel, ChallengePanel, EndedNotice,
   ProcedurePanel, ProposedPanel, SelectionPanel, type Neutral,
 } from '@/components/arbitration/Panels'
-import type { ArbAgreement, ArbAssignment, ArbAward, ArbDocument, ArbHearing, ArbStep, ArbSubmission, Arbitration, TimelineEntry } from '@/lib/types'
+import type { ArbAgreement, ArbAssignment, ArbAward, ArbChallenge, ArbDocument, ArbHearing, ArbStep, ArbSubmission, Arbitration, TimelineEntry } from '@/lib/types'
 
 export default async function ArbitrationPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
@@ -32,7 +32,7 @@ export default async function ArbitrationPage(props: { params: Promise<{ id: str
   const isParty = isClaimant || isRespondent
   const isArbitrator = profile.id === arb.arbitrator_id
 
-  const [assignQ, docsQ, stepsQ, subsQ, hearQ, awardQ, confQ, rulesQ, tlQ, agrQ, signersQ] = await Promise.all([
+  const [assignQ, docsQ, stepsQ, subsQ, hearQ, awardQ, confQ, rulesQ, tlQ, agrQ, signersQ, chalQ] = await Promise.all([
     supabase.from('arb_assignments').select('*').eq('arbitration_id', arb.id).order('created_at', { ascending: false }),
     supabase.from('arb_documents').select('*').eq('arbitration_id', arb.id).order('created_at'),
     supabase.from('arb_steps').select('*').eq('arbitration_id', arb.id).order('seq'),
@@ -44,6 +44,7 @@ export default async function ArbitrationPage(props: { params: Promise<{ id: str
     supabase.rpc('arb_timeline', { p_arb: arb.id }),
     supabase.from('arb_agreements').select('*').eq('arbitration_id', arb.id).maybeSingle(),
     supabase.rpc('arb_agreement_signers', { p_arb: arb.id }),
+    supabase.from('arb_challenges').select('*').eq('arbitration_id', arb.id).order('created_at'),
   ])
   const assignments = (assignQ.data ?? []) as ArbAssignment[]
   const docs = (docsQ.data ?? []) as ArbDocument[]
@@ -56,6 +57,7 @@ export default async function ArbitrationPage(props: { params: Promise<{ id: str
   const timeline = (tlQ.data ?? []) as TimelineEntry[]
   const agreement = (agrQ.data ?? null) as ArbAgreement | null
   const signers = (signersQ.data ?? []) as { user_id: string; signed_at: string }[]
+  const challenges = (chalQ.data ?? []) as ArbChallenge[]
 
   const ids = new Set<string>([arb.claimant_id, arb.respondent_id])
   if (arb.arbitrator_id) ids.add(arb.arbitrator_id)
@@ -64,6 +66,7 @@ export default async function ArbitrationPage(props: { params: Promise<{ id: str
   submissions.forEach((s) => ids.add(s.submitted_by))
   confirmations.forEach((c) => ids.add(c.user_id))
   signers.forEach((x) => ids.add(x.user_id))
+  challenges.forEach((c) => { ids.add(c.challenger_id); ids.add(c.arbitrator_id) })
   const { data: people } = await supabase.rpc('profile_names', { p_ids: [...ids] })
   const names = (people ?? {}) as Record<string, string>
 
@@ -95,6 +98,7 @@ export default async function ArbitrationPage(props: { params: Promise<{ id: str
         <ProcedurePanel arb={arb} steps={steps} submissions={submissions} docs={docs} hearings={hearings} names={names}
           viewerId={profile.id} isArbitrator={isArbitrator} isParty={isParty} />
       )}
+      <ChallengePanel arb={arb} challenges={challenges} names={names} isParty={isParty} isArbitrator={isArbitrator} />
       <AwardPanel arb={arb} award={award} docs={docs} isArbitrator={isArbitrator} />
       <ArbDocumentsPanel docs={docs} names={names} />
       <ArbLifecycle arb={arb} isParty={isParty} isArbitrator={isArbitrator} />
