@@ -1,105 +1,49 @@
 import Link from 'next/link'
-import HayahLogo from '@/components/HayahLogo'
-import { BRAND } from '@/lib/brand'
 
-const methods = [
-  { number: '01', title: 'التفاوض', text: 'مساحة منظمة لعرض وجهات النظر ومحاولة الوصول إلى حل ودي.' },
-  { number: '02', title: 'الوساطة', text: 'إدارة النزاع بمساعدة وسيط، مع توثيق الخطوات والاتفاقات داخل المنصة.' },
-  { number: '03', title: 'التوفيق', text: 'استكشاف مقترحات تسوية تساعد الأطراف على تقريب وجهات النظر.' },
-  { number: '04', title: 'التحكيم الاتفاقي', text: 'إدارة بعض إجراءات التحكيم عند وجود اتفاق بين الأطراف، وفق نطاق خدمات المنصة.' },
-]
-
-const features = [
-  { icon: '01', title: 'مسار واضح للنزاع', text: 'تابع مراحل الملف والإجراءات المطلوبة من خلال تجربة رقمية منظمة.' },
-  { icon: '02', title: 'مستندات موثقة', text: 'تدعم المنصة حفظ المستندات والتحقق من سلامة الملفات وفق الوظائف المتاحة.' },
-  { icon: '03', title: 'جلسات عن بُعد', text: 'إمكانية إدارة جلسات إلكترونية بحسب إعدادات الملف وتوافر الخدمة.' },
-  { icon: '04', title: 'اتفاقات وسجل إجراءات', text: 'توثيق الإجراءات والاتفاقات ضمن سجل الملف وفق آليات المنصة.' },
+const POINTS = [
+  { t: 'مستندات مختومة', d: 'كل ملف يُرفع تُحسب له بصمة SHA-256 على الخادم، ويمكن لأي طرف إعادة فحص سلامته في أي وقت.' },
+  { t: 'سجل تدقيق متسلسل', d: 'كل إجراء يُسجَّل تلقائيًا في قاعدة البيانات ضمن سلسلة بصمات لا تقبل التعديل أو الحذف، ويمكن للمدير التحقق من سلامة السلسلة.' },
+  { t: 'اتفاق تسوية بتوقيع الطرفين', d: 'يصوغ الوسيط الاتفاق ثم يُغلق نصه، ويوقّع كل طرف بعد إعادة إدخال كلمة المرور، مع حفظ بصمة النص ووقت التوقيع وعنوان الاتصال.' },
 ]
 
 export default function Home() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[#F8F6F1] text-[#0A1628]">
-      <header className="sticky top-0 z-40 border-b border-[#0A1628]/10 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
-          <HayahLogo href="/" size="sm" variant="default" className="landing-header-logo" />
-          <nav className="hidden items-center gap-7 text-sm font-semibold md:flex">
-            <a href="#services" className="transition hover:text-[#0A1628]">الخدمات</a>
-            <a href="#how-it-works" className="transition hover:text-[#0A1628]">كيف تعمل</a>
-            <a href="#trust" className="transition hover:text-[#0A1628]">التوثيق والثقة</a>
-          </nav>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="hidden rounded-xl px-4 py-2.5 text-sm font-bold text-[#0A1628] hover:bg-[#0A1628]/5 sm:inline-flex">تسجيل الدخول</Link>
-            <Link href="/register" className="rounded-xl bg-[#0A1628] px-4 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#16263F]">ابدأ الآن</Link>
-          </div>
-        </div>
+    <main className="min-h-screen">
+      <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5">
+        <span className="text-2xl font-extrabold">حياة<span className="text-gold">.</span></span>
+        <nav className="flex gap-2">
+          <Link href="/login" className="btn btn-ghost">دخول</Link>
+          <Link href="/register" className="btn btn-primary">إنشاء حساب</Link>
+        </nav>
       </header>
 
-      <section className="relative isolate">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top_left,_rgba(198,146,42,0.18),_transparent_40%),linear-gradient(135deg,#0A1628,#16263F_58%,#0A1628)]" />
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 text-white sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:px-8 lg:py-28">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-[#F5D06A]"><span className="h-2 w-2 rounded-full bg-[#F5D06A]" /> طريق رقمي أكثر تنظيمًا لحل النزاعات</span>
-            <h1 className="mt-7 max-w-3xl text-4xl font-extrabold leading-[1.35] sm:text-5xl lg:text-6xl">نحو مستقبل <span className="text-[#F5D06A]">أسرع للعدالة</span></h1>
-            <p className="mt-6 max-w-2xl text-lg leading-9 text-white/80 sm:text-xl">منصة رقمية تساعد الأطراف على إدارة المنازعات المدنية والتجارية، وتنظيم إجراءات التسوية وتوثيق خطواتها في مكان واحد.</p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Link href="/register" className="inline-flex items-center justify-center rounded-xl bg-[#F5D06A] px-6 py-3.5 font-extrabold text-[#0A1628] shadow-lg transition hover:-translate-y-0.5 hover:bg-[#E6EAF0]">إنشاء حساب <span className="mr-2" aria-hidden="true">←</span></Link>
-              <a href="#how-it-works" className="inline-flex items-center justify-center rounded-xl border border-white/30 bg-white/5 px-6 py-3.5 font-bold text-white transition hover:bg-white/10">تعرّف على المنصة</a>
-            </div>
-            <p className="mt-5 text-xs leading-6 text-white/60">المنصة أداة لإدارة الإجراءات وتوثيقها، ولا تُعد جهة قضائية أو جهة تحكيم.</p>
-          </div>
-          <div className="relative mx-auto w-full max-w-lg">
-            <div className="absolute -inset-5 rounded-[2rem] bg-[#F5D06A]/10 blur-2xl" />
-            <div className="relative rounded-[2rem] border border-white/20 bg-white/10 p-5 shadow-2xl backdrop-blur sm:p-7">
-              <div className="flex items-center justify-between border-b border-white/15 pb-5">
-                <div><p className="text-sm text-white/65">مسار إدارة النزاع</p><h2 className="mt-1 text-xl font-extrabold">من الخلاف إلى التسوية</h2></div>
-                <span className="rounded-2xl bg-[#F5D06A]/15 p-3 text-2xl text-[#F5D06A]" aria-hidden="true">⚖</span>
-              </div>
-              <div className="mt-6 space-y-4">
-                {[
-                  ['1', 'تسجيل النزاع', 'إدخال البيانات الأساسية والمستندات'],
-                  ['2', 'دعوة الطرف الآخر', 'بدء التواصل ضمن مسار منظم'],
-                  ['3', 'إدارة الإجراءات', 'اختيار المسار المناسب وتوثيق الخطوات'],
-                  ['4', 'توثيق النتيجة', 'حفظ الاتفاق أو نتيجة الإجراءات بحسب الحالة'],
-                ].map(([n, title, text]) => <div key={n} className="flex items-center gap-4 rounded-2xl border border-white/10 bg-[#0A1628]/45 p-4"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F5D06A] font-extrabold text-[#0A1628]">{n}</span><div><h3 className="font-bold">{title}</h3><p className="mt-1 text-sm text-white/65">{text}</p></div></div>)}
-              </div>
-              <div className="mt-5 rounded-xl bg-white/10 px-4 py-3 text-sm text-white/75">تُحدّد الإجراءات المتاحة وفق نوع الملف وصلاحيات المستخدم.</div>
-            </div>
+      <section className="bg-navy text-white">
+        <div className="mx-auto max-w-5xl px-4 py-16 sm:py-24">
+          <h1 className="max-w-2xl text-3xl leading-snug sm:text-5xl sm:leading-snug">
+            وساطة إلكترونية للنزاعات التجارية، وكل خطوة فيها موثّقة
+          </h1>
+          <p className="mt-5 max-w-xl text-lg text-navy-100">
+            شركتان، وسيط تعتمده المنصة، جلسات بالفيديو، واتفاق تسوية موقّع إلكترونيًا. وإن لم تنتهِ الوساطة بتسوية، فمسار اختياري إلى تحكيم اتفاقي يُدار على المنصة.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/register" className="btn btn-gold">ابدأ نزاعًا جديدًا</Link>
+            <Link href="/login" className="btn border border-white/30 text-white hover:bg-white/10">لدي حساب</Link>
           </div>
         </div>
       </section>
 
-      <section id="trust" className="border-b border-[#E6EAF0] bg-white">
-        <div className="mx-auto grid max-w-7xl gap-5 px-5 py-7 sm:grid-cols-3 lg:px-8">
-          {[['توثيق الإجراءات', 'سجل منظم للخطوات التي تتم داخل المنصة'], ['حماية الوصول', 'إجراءات وصلاحيات بحسب دور المستخدم'], ['إدارة رقمية', 'الوصول إلى تفاصيل الملف من مكان واحد']].map(([title, text]) => <div key={title} className="flex items-start gap-3"><span className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F5D06A] font-bold text-[#0A1628]">✓</span><div><h2 className="font-extrabold">{title}</h2><p className="mt-1 text-sm leading-6 text-[#3A4C63]">{text}</p></div></div>)}
-        </div>
+      <section className="mx-auto grid max-w-5xl gap-4 px-4 py-12 sm:grid-cols-3">
+        {POINTS.map((p) => (
+          <div key={p.t} className="panel">
+            <h2 className="mb-2 text-lg">{p.t}</h2>
+            <p className="hint">{p.d}</p>
+          </div>
+        ))}
       </section>
 
-      <section id="services" className="mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-24">
-        <div className="mx-auto max-w-3xl text-center"><p className="font-extrabold text-[#0A1628]">خدمات المنصة</p><h2 className="mt-3 text-3xl font-extrabold leading-relaxed sm:text-4xl">خيارات متعددة لإدارة الخلافات</h2><p className="mt-3 leading-8 text-[#3A4C63]">تختلف الطريقة الأنسب بحسب طبيعة النزاع وموافقة الأطراف والإطار القانوني المنطبق.</p></div>
-        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {methods.map((m) => <article key={m.number} className="group rounded-2xl border border-[#E6EAF0] bg-white p-6 shadow-[0_4px_20px_rgba(10,22,40,0.05)] transition hover:-translate-y-1 hover:border-[#0A1628]/40 hover:shadow-[0_12px_32px_rgba(10,22,40,0.12)]"><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F5D06A] text-sm font-extrabold text-[#0A1628] transition group-hover:bg-[#0A1628] group-hover:text-white">{m.number}</span><h3 className="mt-5 text-xl font-extrabold">{m.title}</h3><p className="mt-3 text-sm leading-7 text-[#3A4C63]">{m.text}</p></article>)}
-        </div>
-      </section>
-
-      <section id="how-it-works" className="bg-[#F1ECDD] py-20 lg:py-24">
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 lg:grid-cols-2 lg:px-8">
-          <div><p className="font-extrabold text-[#0A1628]">كيف تعمل حياة؟</p><h2 className="mt-3 text-3xl font-extrabold leading-relaxed sm:text-4xl">خطوات أوضح، وتجربة أكثر تنظيمًا</h2><p className="mt-5 leading-8 text-[#3A4C63]">تجمع المنصة عناصر إدارة النزاع في مسار رقمي واحد، مع إبقاء القرارات الإجرائية للأطراف والجهات المختصة بحسب الحالة.</p><Link href="/register" className="mt-7 inline-flex rounded-xl bg-[#0A1628] px-6 py-3.5 font-bold text-white transition hover:bg-[#16263F]">ابدأ باستخدام المنصة</Link></div>
-          <div className="space-y-4">{features.map((f) => <div key={f.icon} className="flex gap-4 rounded-2xl border border-[#E6EAF0] bg-white p-5"><span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#0A1628] font-extrabold text-white">{f.icon}</span><div><h3 className="font-extrabold">{f.title}</h3><p className="mt-1 text-sm leading-7 text-[#3A4C63]">{f.text}</p></div></div>)}</div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-        <div className="overflow-hidden rounded-[2rem] bg-[#0A1628] px-6 py-12 text-center text-white sm:px-12 sm:py-16">
-          <p className="font-bold text-[#F5D06A]">ابدأ بخطوتك الأولى</p><h2 className="mx-auto mt-3 max-w-3xl text-3xl font-extrabold leading-relaxed sm:text-4xl">إدارة رقمية للنزاعات، من البداية وحتى توثيق النتيجة</h2><p className="mx-auto mt-4 max-w-2xl leading-8 text-white/70">أنشئ حسابًا للاطلاع على الوظائف المتاحة داخل المنصة.</p><Link href="/register" className="mt-7 inline-flex rounded-xl bg-[#F5D06A] px-6 py-3.5 font-extrabold text-[#0A1628] transition hover:bg-[#E6EAF0]">إنشاء حساب</Link>
-        </div>
-      </section>
-
-      <footer className="border-t border-[#E6EAF0] bg-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-8 text-sm text-[#3A4C63] sm:flex-row sm:items-center sm:justify-between lg:px-8">
-          <div className="flex flex-col items-start gap-1"><HayahLogo href="/" size="sm" variant="default" /><p>{BRAND.footerLine}</p></div>
-          <p className="max-w-2xl leading-6">تنبيه: المنصة أداة لإدارة الإجراءات وتوثيقها وليست جهة قضائية أو جهة تحكيم. يجب مراجعة النصوص القانونية والإجراءات قبل أي استخدام فعلي.</p>
-          <Link href="/login" className="font-bold text-[#0A1628] hover:underline">تسجيل الدخول</Link>
-        </div>
+      <footer className="mx-auto max-w-5xl px-4 pb-10 text-sm text-navy-500">
+        <p className="mb-2"><Link href="/verify" className="font-semibold text-gold-700 underline">التحقق من محضر صادر عن المنصة</Link></p>
+        نسخة تجريبية للعرض. التوقيع الإلكتروني فيها توقيع بسيط داخل المنصة، وليس توقيعًا مرخّصًا من هيئة تنمية صناعة تكنولوجيا المعلومات، ويجب مراجعة نصوص الاتفاقات قانونيًا قبل أي استخدام فعلي. وفي التحكيم: المنصة أداة لإدارة الإجراءات وتوثيقها وليست جهة تحكيم، ولا تُصدر حكمًا قابلًا للتنفيذ؛ اتفاق التحكيم والحكم يُوقَّعان خارجها.
       </footer>
     </main>
   )

@@ -189,9 +189,7 @@ select public.log_admin_view('arbitration', :'arbw'::uuid);
 select t.ok(position('admin.view_arbitration' in public.arb_timeline(:'arbw'::uuid)::text) > 0, 'V2 the parties see the admin look in their own timeline');
 select t.as_super();
 select t.ok((select count(*) from public.audit_logs where event_type = 'admin.view_arbitration' and actor_id = :'scla'::uuid) = 0, 'V3 a non-admin call writes nothing');
-select t.as_user(:'sadm'::uuid);
 select t.ok((public.verify_audit_chain()->>'ok')::boolean, 'V4 the audit chain still verifies');
-select t.as_super();
 
 -- ====================================================== P. function privileges (a new service-only function cannot be forgotten)
 select t.as_super();

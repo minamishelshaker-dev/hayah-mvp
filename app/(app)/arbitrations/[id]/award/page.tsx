@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server'
 import PrintButton from '@/components/PrintButton'
 import { formatDate, formatEgp } from '@/lib/labels'
 import type { ArbAward, Arbitration } from '@/lib/types'
-import DocumentHeader from '@/components/DocumentHeader'
 
 export default async function AwardPrintPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
@@ -30,7 +29,6 @@ export default async function AwardPrintPage(props: { params: Promise<{ id: stri
         <PrintButton />
       </div>
       <article className="space-y-5 rounded-lg border border-navy-100 bg-white p-8 leading-9 print:rounded-none print:border-0 print:p-0">
-        <DocumentHeader />
         <header className="border-b-2 border-gold pb-3 text-center">
           <p className="text-sm text-navy-500">{draft ? 'مسودة للتوقيع الورقي أو الرقمي — ليست حكمًا نافذًا' : award.signing_mode === 'platform' ? 'نسخة من الحكم الموقَّع رقميًا على المنصة' : 'نسخة من الحكم المسجَّل على المنصة'}</p>
           <h1 className="text-2xl">حكم تحكيم</h1>
