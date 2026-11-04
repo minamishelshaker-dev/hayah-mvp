@@ -58,15 +58,22 @@ const s1 = sessions[0]
 check(s1.auth?.user === 'me@gmail.test' && s1.auth?.pass === 'app-password', 'authenticates with the SMTP account')
 check(s1.cmds.includes('MAIL FROM:<me@gmail.test>'), 'envelope sender is the configured mailbox')
 check(s1.cmds.includes('RCPT TO:<second.party@example.com>'), 'envelope recipient is the second party')
-const [head, ...rest] = s1.data.split('\r\n\r\n')
-const body = Buffer.from(rest.join('').replace(/\s+/g, ''), 'base64').toString('utf8')
-check(body === html, 'HTML body round-trips as UTF-8 (Arabic intact)')
+const head = s1.data.split('\r\n\r\n')[0]
+const boundary = head.match(/boundary="([^"]+)"/)?.[1]
+const parts = boundary ? s1.data.split('--' + boundary).slice(1, -1) : []
+const decodePart = (type) => {
+  const p = parts.find((x) => x.includes('Content-Type: ' + type))
+  return p ? Buffer.from(p.split('\r\n\r\n')[1].replace(/\s+/g, ''), 'base64').toString('utf8') : null
+}
+check(decodePart('text/html') === html, 'HTML part round-trips as UTF-8 (Arabic intact)')
+const text = decodePart('text/plain') ?? ''
+check(text.includes('تمت دعوتك إلى وساطة') && !text.includes('<'), 'plain-text part is readable and tag-free')
 check(/^To: second\.party@example\.com$/m.test(head), 'To header is the second party only')
 check(!/claimant/i.test(head), 'no other recipient in the headers')
 const subj = head.match(/^Subject: =\?UTF-8\?B\?(.+)\?=$/m)
 check(subj && Buffer.from(subj[1], 'base64').toString('utf8') === 'دعوة إلى وساطة — HAYAH-2026-0005', 'Arabic subject is RFC 2047 encoded and decodes back')
 check(/^From: Hayah <me@gmail\.test>$/m.test(head), 'ASCII display name stays readable')
-check(/^Content-Type: text\/html; charset=UTF-8$/m.test(head) && /^MIME-Version: 1\.0$/m.test(head), 'MIME headers present')
+check(/^Content-Type: multipart\/alternative; boundary="[^"]+"$/m.test(head) && /^MIME-Version: 1\.0$/m.test(head), 'MIME multipart/alternative headers present')
 check(/^Message-ID: <[0-9a-f-]+@gmail\.test>$/m.test(head) && /^Date: /m.test(head), 'Message-ID and Date present')
 await new Promise((r) => setTimeout(r, 100)) // the server logs QUIT a moment after the client returns
 check(s1.cmds.at(-1) === 'QUIT', 'session ends with QUIT')
