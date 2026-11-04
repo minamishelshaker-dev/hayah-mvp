@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
-import { mailConfigured } from '@/lib/email'
+import { mailConfigured, mailDiagnostics, smtpConfigured } from '@/lib/email'
+import FormAction from '@/components/FormAction'
+import { sendTestMail } from '../actions'
 import { formatDuration } from '@/lib/utils'
 import { formatEgp } from '@/lib/labels'
 
@@ -25,6 +27,7 @@ export default async function MetricsPage() {
   if (error || !data) return <p role="alert" className="font-semibold text-red-700">تعذّر حساب المؤشرات: {error?.message}</p>
   const m = data as Metrics
 
+  const mail = mailDiagnostics()
   const readiness = [
     { ok: Boolean(process.env.RECORD_SIGNING_PRIVATE_KEY), text: 'مفتاح توقيع المحاضر مضبوط (RECORD_SIGNING_PRIVATE_KEY)، وإلا تصدر المحاضر بلا توقيع رقمي' },
     { ok: sec?.mfa_required === true, text: 'التحقق بخطوتين مفروض على المدير والوسطاء (app_settings.require_mfa)' },
@@ -32,7 +35,7 @@ export default async function MetricsPage() {
     { ok: m.verified_mediators >= 2, text: `وسيطان معتمدان على الأقل (الحالي: ${num(m.verified_mediators)})` },
     { ok: Boolean(process.env.DAILY_API_KEY), text: 'مفتاح Daily.co مضبوط (فيديو حقيقي)' },
     { ok: mailConfigured(), text: 'مزوّد البريد مضبوط (SMTP أو Resend): تصل الدعوة إلى الطرف الثاني تلقائيًا' },
-    { ok: Boolean(process.env.SMTP_HOST) || Boolean(process.env.RESEND_FROM && !process.env.RESEND_FROM.includes('resend.dev')), text: 'مرسِل لا يقتصر على بريد صاحب الحساب (SMTP، أو نطاق موثَّق في Resend)' },
+    { ok: smtpConfigured() || Boolean(process.env.RESEND_FROM && !process.env.RESEND_FROM.includes('resend.dev')), text: 'مرسِل لا يقتصر على بريد صاحب الحساب (SMTP، أو نطاق موثَّق في Resend)' },
     { ok: Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY), text: 'مفتاح خدمة Supabase مضبوط (مطلوب لتسجيل المستندات والتوقيع وقبول الاتفاقيات وغرف الفيديو)' },
     { ok: Boolean(process.env.CRON_SECRET && process.env.ANCHOR_EMAIL && mailConfigured()), text: 'نقطة التحقق اليومية للسجل مضبوطة (CRON_SECRET وANCHOR_EMAIL)' },
     { ok: !(process.env.NEXT_PUBLIC_APP_URL ?? 'localhost').includes('localhost'), text: 'رابط الموقع الفعلي مضبوط في NEXT_PUBLIC_APP_URL' },
@@ -147,6 +150,12 @@ export default async function MetricsPage() {
             </div>
           ))}
         </dl>
+      </section>
+
+      <section className="panel space-y-2">
+        <h2 className="text-lg">اختبار البريد</h2>
+        <p className="hint">المزوّد الحالي: <b dir="ltr">{mail.provider}</b> · المرسِل: <b dir="ltr">{mail.from}</b>{mail.restricted && ' · مرسِل تجريبي (لا يسلّم إلا لبريد صاحب حساب Resend)'}</p>
+        <FormAction action={sendTestMail} submitLabel="أرسل رسالة اختبار إلى بريدي" variant="gold" />
       </section>
 
       <section className="panel">

@@ -32,6 +32,8 @@ const smtpConfig = () => {
   return host && user && pass ? { host, user, pass, port: Number(process.env.SMTP_PORT) || 465 } : null
 }
 export const mailConfigured = () => Boolean(smtpConfig() || process.env.RESEND_API_KEY)
+// True only when host AND user AND password are all set (a lone SMTP_HOST must not count as "configured").
+export const smtpConfigured = () => Boolean(smtpConfig())
 const fromAddress = () => process.env.MAIL_FROM ?? process.env.RESEND_FROM ?? (smtpConfig() ? `Hayah <${process.env.SMTP_USER}>` : 'Hayah <onboarding@resend.dev>')
 
 // Never throws. Failures are written to the runtime logs (no message content, no secrets) so they can be diagnosed.
@@ -96,4 +98,15 @@ export async function sendAnchorEmail(to: string, head: { seq: number; row_hash:
 // Generic RTL mail. Best-effort: returns false (never throws) when no provider is configured or sending fails.
 export async function sendMail(to: string, subject: string, htmlBody: string): Promise<boolean> {
   return (await deliver(to, subject, wrap(htmlBody))).ok
+}
+
+// What the admin readiness page and the test button report. Never includes secrets.
+export function mailDiagnostics() {
+  const provider: 'smtp' | 'resend' | 'none' = smtpConfig() ? 'smtp' : process.env.RESEND_API_KEY ? 'resend' : 'none'
+  const restricted = provider === 'resend' && (!process.env.RESEND_FROM || process.env.RESEND_FROM.includes('resend.dev'))
+  return { provider, from: fromAddress(), restricted }
+}
+
+export async function sendTestEmail(to: string): Promise<MailResult> {
+  return deliver(to, 'رسالة اختبار — حياة للعدالة الرقمية', wrap('<p>هذه رسالة اختبار من منصة حياة. وصولها يعني أن إعداد البريد يعمل.</p><p>إن وصلتك في البريد المزعج فاعلِّمها «ليست مزعجة» حتى تصل دعوات الأطراف إلى الوارد.</p>'))
 }

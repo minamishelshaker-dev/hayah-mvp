@@ -21,8 +21,21 @@ function formatFrom(from: string): string {
   return name ? `${encodeWord(name)} <${m[2].trim()}>` : m[2].trim()
 }
 
+// Readable plain-text twin of the HTML body. Mail with only an HTML part scores worse with spam filters, and some clients show only text.
+export function htmlToText(html: string): string {
+  return html
+    .replace(/<(script|style)[\s\S]*?<\/\1>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|tr|h[1-6]|li)>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&')
+    .replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim()
+}
+
+const b64Lines = (s: string) => (b64(s).match(/.{1,76}/g) ?? []).join(CRLF)
+
 export function buildMessage(m: SmtpMessage, messageIdDomain: string): string {
-  const body = (b64(m.html).match(/.{1,76}/g) ?? []).join(CRLF)
+  const boundary = `=_hayah_${randomUUID()}`
   return [
     `From: ${formatFrom(m.from)}`,
     `To: ${bareAddress(m.to)}`,
@@ -30,10 +43,19 @@ export function buildMessage(m: SmtpMessage, messageIdDomain: string): string {
     `Date: ${new Date().toUTCString()}`,
     `Message-ID: <${randomUUID()}@${messageIdDomain}>`,
     'MIME-Version: 1.0',
+    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/plain; charset=UTF-8',
+    'Content-Transfer-Encoding: base64',
+    '',
+    b64Lines(htmlToText(m.html)),
+    `--${boundary}`,
     'Content-Type: text/html; charset=UTF-8',
     'Content-Transfer-Encoding: base64',
     '',
-    body,
+    b64Lines(m.html),
+    `--${boundary}--`,
     '',
   ].join(CRLF)
 }

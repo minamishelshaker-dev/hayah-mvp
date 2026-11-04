@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { notifyUserEmail } from '@/lib/notify'
+import { mailDiagnostics, sendTestEmail } from '@/lib/email'
 import type { ActionResult } from '@/lib/types'
 
 export async function updateUser(userId: string, fd: FormData): Promise<ActionResult> {
@@ -76,4 +77,18 @@ export async function resetMfa(userId: string, _fd?: FormData): Promise<ActionRe
   await notifyUserEmail(userId, 'أُعيد تعيين التحقق بخطوتين لحسابك في حياة', '<p>أعاد مدير المنصة تعيين التحقق بخطوتين لحسابك، وسيُطلب منك تسجيله من جديد عند دخولك التالي.</p><p><b>إن لم تكن تتوقع ذلك فتواصل مع الإدارة فورًا</b> وغيّر كلمة مرورك.</p>')
   revalidatePath('/admin/users')
   return { message: 'أُعيد تعيين المصادقة الثنائية. سيُطلب من الحساب تسجيلها من جديد عند دخوله التالي.' }
+}
+
+// Lets the admin prove the mail setup works without waiting for a real invitation. Sends ONE message, to the admin's own address.
+export async function sendTestMail(_fd?: FormData): Promise<ActionResult> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user?.email) return { error: 'غير مصرح' }
+  const { data: me } = await supabase.from('profiles').select('role').eq('id', user.id).maybeSingle()
+  if (me?.role !== 'admin') return { error: 'غير مصرح' }
+  const d = mailDiagnostics()
+  if (d.provider === 'none') return { error: 'لا يوجد مزوّد بريد مضبوط: أضف SMTP_HOST وSMTP_USER وSMTP_PASS في Vercel ثم أعد النشر.' }
+  const r = await sendTestEmail(user.email)
+  if (!r.ok) return { error: `تعذّر الإرسال: ${r.reason}` }
+  return { message: `أُرسلت رسالة اختبار إلى ${user.email} عبر ${r.via === 'smtp' ? 'SMTP' : 'Resend'} (المرسِل: ${d.from}). تحقق من الوارد ومن البريد المزعج.${d.restricted ? ' تنبيه: مرسِل Resend الحالي تجريبي ولا يسلّم إلا لبريد صاحب الحساب.' : ''}` }
 }
