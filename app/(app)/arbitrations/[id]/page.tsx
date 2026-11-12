@@ -7,7 +7,7 @@ import {
   AgreementPanel, ArbDocumentsPanel, ArbGate, ArbHeader, ArbLifecycle, AwardPanel, ChallengePanel, EndedNotice,
   ProcedurePanel, ProposedPanel, SelectionPanel, type Neutral,
 } from '@/components/arbitration/Panels'
-import type { ArbAgreement, ArbAssignment, ArbAward, ArbChallenge, ArbDocument, ArbHearing, ArbStep, ArbSubmission, Arbitration, TimelineEntry } from '@/lib/types'
+import type { ArbAgreement, ArbAssignment, ArbAward, ArbChallenge, ArbDocument, ArbHearing, ArbStep, ArbSubmission, Arbitration, NominationState, TimelineEntry } from '@/lib/types'
 
 export default async function ArbitrationPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
@@ -76,6 +76,11 @@ export default async function ArbitrationPage(props: { params: Promise<{ id: str
     directory = ((m ?? []) as { id: string; name: string; bio: string | null; specializations: string[] | null; years_experience: number | null }[])
       .map((x) => ({ id: x.id, name: x.name, bio: x.bio, specializations: x.specializations ?? [], years_experience: x.years_experience }))
   }
+  let nomination: NominationState | null = null
+  if (isParty && arb.status === 'selection') {
+    const { data: ns } = await supabase.rpc('arb_nomination_state', { p_arb: arb.id })
+    nomination = (ns ?? null) as NominationState | null
+  }
   const beyondAgreement = ['selection', 'active', 'deliberation', 'closed'].includes(arb.status)
   const template = arbAgreementTemplate({
     arbNumber: arb.arb_number, claimant: names[arb.claimant_id] ?? '[اسم الطرف الأول]',
@@ -92,7 +97,7 @@ export default async function ArbitrationPage(props: { params: Promise<{ id: str
           agreement={agreement} signers={signers} template={template} />
       )}
       {arb.status === 'selection' && (
-        <SelectionPanel arb={arb} assignments={assignments} directory={directory} names={names} viewerId={profile.id} isParty={isParty} />
+        <SelectionPanel arb={arb} assignments={assignments} directory={directory} nomination={nomination} names={names} viewerId={profile.id} isParty={isParty} />
       )}
       {['active', 'deliberation', 'closed'].includes(arb.status) && arb.arbitrator_id && (
         <ProcedurePanel arb={arb} steps={steps} submissions={submissions} docs={docs} hearings={hearings} names={names}

@@ -183,6 +183,52 @@ export async function proposeArbitrator(arbId: string, arbitratorId: string, _fd
   return { message: 'تم اقتراح المحكّم. بانتظار موافقة الطرف الآخر.' }
 }
 
+// ------------------------------------------------------------------ nomination by the platform (migration 15)
+async function notifyApprovedArbitrator(arbId: string) {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return
+  const { data } = await createAdminClient().from('arb_assignments').select('id').eq('arbitration_id', arbId).eq('status', 'approved').maybeSingle()
+  if (data?.id) await notifyArbitration(arbId, 'arbitrator_appointed', { roles: [], arbitratorOfAssignment: data.id })
+}
+
+export async function requestNomination(arbId: string, _fd?: FormData): Promise<ActionResult> {
+  const { error } = await (await createClient()).rpc('request_nomination', { p_arb: arbId })
+  if (error) return { error: error.message }
+  await notifyArbitration(arbId, 'nomination_requested', { roles: ['claimant', 'respondent'], except: (await currentActor())?.id })
+  revalidatePath(`/arbitrations/${arbId}`)
+  return { message: 'سحبت المنصة قائمة الترشيح بقرعة عشوائية. اختر محكّمًا من القائمة.' }
+}
+
+export async function chooseNominee(arbId: string, nominationId: string, nomineeId: string | null, _fd?: FormData): Promise<ActionResult> {
+  const { data, error } = await (await createClient()).rpc('choose_nominee', { p_nomination: nominationId, p_choice: nomineeId })
+  if (error) return { error: error.message }
+  const state = String(data)
+  if (state === 'agreed') { await notifyApprovedArbitrator(arbId); await notifyArbitration(arbId, 'nomination_decided', { roles: ['claimant', 'respondent'], except: (await currentActor())?.id }) }
+  if (state === 'no_agreement') await notifyArbitration(arbId, 'nomination_decided', { roles: ['claimant', 'respondent'], except: (await currentActor())?.id })
+  revalidatePath(`/arbitrations/${arbId}`)
+  const msg: Record<string, string> = {
+    waiting: 'سُجّل اختيارك. بانتظار اختيار الطرف الآخر.',
+    agreed: 'اتفق الطرفان على المحكّم نفسه. بانتظار قبوله المهمة.',
+    no_agreement: 'لم يتفق الطرفان على محكّم من القائمة. يمكنكما التوقيع على إقرار تفويض المنصة بالقرعة.',
+    superseded: 'أُلغي الترشيح لوجود اقتراح محكّم آخر قيد الانتظار.',
+  }
+  return { message: msg[state] ?? 'تم.' }
+}
+
+export async function ackPlatformAppointment(arbId: string, nominationId: string, _fd?: FormData): Promise<ActionResult> {
+  const { data, error } = await (await createClient()).rpc('ack_platform_appointment', { p_nomination: nominationId })
+  if (error) return { error: error.message }
+  const state = String(data)
+  if (state === 'appointed') { await notifyApprovedArbitrator(arbId); await notifyArbitration(arbId, 'nomination_decided', { roles: ['claimant', 'respondent'], except: (await currentActor())?.id }) }
+  revalidatePath(`/arbitrations/${arbId}`)
+  const msg: Record<string, string> = {
+    waiting: 'سُجّل إقرارك. بانتظار توقيع الطرف الآخر.',
+    appointed: 'وقّع الطرفان الإقرار، وأجرت المنصة القرعة وعيّنت المحكّم. بانتظار قبوله المهمة.',
+    no_eligible: 'لم يعد أيّ من المرشحين مؤهلًا. اطلب ترشيحًا جديدًا.',
+    superseded: 'أُلغي الترشيح لوجود اقتراح محكّم آخر قيد الانتظار.',
+  }
+  return { message: msg[state] ?? 'تم.' }
+}
+
 export async function partyRespondArbitrator(arbId: string, assignmentId: string, approve: boolean, _fd?: FormData): Promise<ActionResult> {
   const { error } = await (await createClient()).rpc('party_respond_arbitrator', { p_assignment: assignmentId, p_approve: approve })
   if (error) return { error: error.message }

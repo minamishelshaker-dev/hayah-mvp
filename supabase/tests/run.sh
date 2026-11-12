@@ -13,7 +13,7 @@ for f in "${FILES[@]}"; do
 done
 echo "== tests"
 out="$(mktemp)"
-for f in tests/tests.sql tests/lifecycle_tests.sql tests/mfa_tests.sql tests/trust_tests.sql tests/followups_tests.sql tests/arbitration_tests.sql tests/arb_signing_tests.sql tests/settlement_bound_tests.sql; do
+for f in tests/tests.sql tests/lifecycle_tests.sql tests/mfa_tests.sql tests/trust_tests.sql tests/followups_tests.sql tests/arbitration_tests.sql tests/arb_signing_tests.sql tests/settlement_bound_tests.sql tests/arb_nomination_tests.sql; do
   if ! psql -q -v ON_ERROR_STOP=1 -d "$DB" -f "$f" >>"$out" 2>&1; then
     grep -E "FAIL|ERROR" "$out" | tail -5
     echo "TESTS FAILED in $f"; exit 1
