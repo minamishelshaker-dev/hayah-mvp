@@ -80,6 +80,7 @@ export type ArbNotifyEvent =
   | 'arbitrator_seated' | 'arbitrator_declined' | 'step_set' | 'statement_submitted' | 'hearing_scheduled'
   | 'proceedings_closed' | 'award_issued' | 'arbitration_ended' | 'arbitrator_withdrew'
   | 'agreement_opened' | 'agreement_signed' | 'challenge_filed' | 'challenge_decided'
+  | 'nomination_requested' | 'nomination_decided' | 'arbitrator_appointed'
 
 const ARB_MESSAGES: Record<ArbNotifyEvent, string> = {
   escalation_proposed: 'طُلب تصعيد النزاع إلى التحكيم ويحتاج ردّك.',
@@ -100,6 +101,9 @@ const ARB_MESSAGES: Record<ArbNotifyEvent, string> = {
   challenge_decided: 'بتَّ المحكّم في طلب رده. راجع القرار وأسبابه في الملف.',
   agreement_opened: 'فُتح نص اتفاق التحكيم للتوقيع على المنصة ويحتاج قراءتك وتوقيعك.',
   agreement_signed: 'وقّع الطرف الآخر اتفاق التحكيم على المنصة. إن لم توقّع بعد فاطّلع عليه ووقّع.',
+  nomination_requested: 'طُلب من المنصة ترشيح محكّمين لملف التحكيم، وتحتاج إلى اختيارك من القائمة.',
+  nomination_decided: 'حُسم ترشيح المحكّمين. راجع النتيجة والخطوة التالية في الملف.',
+  arbitrator_appointed: 'عُيّنتَ محكّمًا في ملف تحكيم (باتفاق الطرفين على الترشيح أو بقرعة المنصة بعد موافقتهما). يلزم قبولك المهمة وتقديم إقرار الاستقلال.',
 }
 
 export async function notifyArbitration(

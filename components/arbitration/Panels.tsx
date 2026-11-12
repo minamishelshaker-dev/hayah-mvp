@@ -13,8 +13,9 @@ import {
   openArbAgreement, partyRespondArbitrator, proposeArbitrator, reopenArbAgreement, respondEscalation, retryArbAttestation,
   saveAwardDraft, saveArbAgreement, scheduleHearing, setStep, signArbAgreement, signAward,
   submitStatement, terminateArbitration, withdrawArbitration, challengeArbitrator, decideChallenge,
+  requestNomination, chooseNominee, ackPlatformAppointment,
 } from '@/app/(app)/arbitrations/actions'
-import type { ArbAgreement, ArbAssignment, ArbAward, ArbChallenge, ArbDocument, ArbHearing, ArbStep, ArbSubmission, Arbitration } from '@/lib/types'
+import type { ArbAgreement, ArbAssignment, ArbAward, ArbChallenge, ArbDocument, ArbHearing, ArbStep, ArbSubmission, Arbitration, NominationState } from '@/lib/types'
 
 type Names = Record<string, string>
 export type Neutral = { id: string; name: string; bio: string | null; specializations: string[]; years_experience: number | null }
@@ -287,18 +288,20 @@ export function AgreementPanel({ arb, docs, confirmations, names, viewerId, isPa
 }
 
 // ------------------------------------------------------------------ stage 3: choosing the arbitrator
-export function SelectionPanel({ arb, assignments, directory, names, viewerId, isParty }: {
-  arb: Arbitration; assignments: ArbAssignment[]; directory: Neutral[]; names: Names; viewerId: string; isParty: boolean
+export function SelectionPanel({ arb, assignments, directory, nomination, names, viewerId, isParty }: {
+  arb: Arbitration; assignments: ArbAssignment[]; directory: Neutral[]; nomination: NominationState | null; names: Names; viewerId: string; isParty: boolean
 }) {
   const open = assignments.some((a) => a.status === 'proposed' || a.status === 'approved')
   const label: Record<string, string> = { proposed: 'بانتظار موافقة الطرف الآخر', approved: 'بانتظار قبول المحكّم', accepted: 'قبل المهمة', rejected: 'مرفوض', ended: 'انسحب' }
   const mine = assignments.find((a) => a.status === 'approved' && a.arbitrator_id === viewerId)
+  const nominationActive = nomination?.status === 'open' || nomination?.status === 'no_agreement'
   return (
     <section className="panel space-y-4">
       <div>
         <h2 className="text-lg">اختيار المحكّم</h2>
-        <p className="hint">محكّم منفرد يتفق عليه الطرفان. لا يجوز لمن عمل وسيطًا في الوساطة السابقة أن يكون محكّمًا في هذا الملف، ولا يوجد استثناء من ذلك في المنصة.</p>
+        <p className="hint">محكّم منفرد. الأصل أن يتفق عليه الطرفان؛ فإن لم يتفقا فلأي منهما طلب ترشيح من المنصة (قرعة عشوائية بين محكّمين معتمدين لا تعارض بينهم وبين الطرفين، بحد أقصى خمسة)، ثم يختار كل طرف واحدًا منهم. وعند عدم الاتفاق على أحدهم يوقّع الطرفان إقرارًا يفوّض المنصة بإجراء قرعة بين المرشحين. لا يجوز لمن عمل وسيطًا في الوساطة السابقة أن يكون محكّمًا في هذا الملف.</p>
       </div>
+      {isParty && nomination && <NominationBlock arbId={arb.id} nomination={nomination} />}
       {assignments.map((a) => (
         <div key={a.id} className="rounded-md border border-navy-100 p-3">
           <p className="font-semibold">{nm(names, a.arbitrator_id)} <span className="hint">— {label[a.status]}</span></p>
@@ -318,7 +321,15 @@ export function SelectionPanel({ arb, assignments, directory, names, viewerId, i
           <textarea id="disclosure" name="disclosure" rows={5} required minLength={30} className="input" />
         </FormAction>
       )}
-      {isParty && !open && (
+      {isParty && !open && !nominationActive && (
+        <div className="space-y-3 border-t border-navy-100 pt-3">
+          <h3 className="text-sm">الترشيح من المنصة</h3>
+          <p className="hint">إن لم تتفقا على محكّم بعينه، اطلب أن تسحب المنصة قائمة ترشيح بالقرعة. لا ترتّب المنصة المحكّمين بحسب نتائج أحكامهم ولا بأي اعتبار تجاري، وتُسجَّل بذرة القرعة ليمكن التحقق منها.</p>
+          <FormAction action={requestNomination.bind(null, arb.id)} submitLabel="اطلب ترشيحًا من المنصة" variant="gold"
+            confirmText="ستسحب المنصة بالقرعة حتى خمسة محكّمين معتمدين ويظهرون للطرفين. هل تريد المتابعة؟" />
+        </div>
+      )}
+      {isParty && !open && !nominationActive && (
         <div className="space-y-3">
           <h3 className="text-sm">محكّمون تعتمدهم المنصة</h3>
           <p className="hint">يظهر هنا من رقّته الإدارة إلى محكّم بعد التحقق من هويته. الاعتماد قرار إداري لا شهادة مهنية.</p>
@@ -336,6 +347,70 @@ export function SelectionPanel({ arb, assignments, directory, names, viewerId, i
         </div>
       )}
     </section>
+  )
+}
+
+// ------------------------------------------------------------------ nomination by the platform (migration 15)
+function NominationBlock({ arbId, nomination: n }: { arbId: string; nomination: NominationState }) {
+  const nameOf = (id: string | null) => n.nominees.find((x) => x.id === id)?.name ?? 'لا أحد من المرشحين'
+  const decided = n.status !== 'open'
+  const STATUS: Record<NominationState['status'], string> = {
+    open: 'بانتظار اختيار الطرفين',
+    agreed: 'اتفق الطرفان على المحكّم نفسه',
+    no_agreement: 'لم يتفق الطرفان: بانتظار الإقرار بتفويض المنصة',
+    appointed: 'عيّنت المنصة المحكّم بالقرعة بعد إقرار الطرفين',
+    cancelled: 'أُلغي الترشيح',
+  }
+  return (
+    <div className="space-y-3 rounded-md border border-gold bg-gold-100/30 p-3">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h3 className="text-sm">قائمة الترشيح (الجولة {n.round})</h3>
+        <span className="hint">{STATUS[n.status]}</span>
+      </div>
+      {n.nominees.map((m) => (
+        <div key={m.id} className="flex flex-col justify-between gap-2 rounded-md border border-navy-100 bg-white p-3 sm:flex-row sm:items-center">
+          <div>
+            <p className="font-semibold">{m.name}</p>
+            <p className="hint">{m.years_experience ? `${m.years_experience} سنة خبرة` : ''}{m.specializations?.length ? ` — ${m.specializations.join('، ')}` : ''}</p>
+            {m.bio && <p className="hint">{m.bio}</p>}
+          </div>
+          {n.status === 'open' && !n.i_chose && (
+            <FormAction action={chooseNominee.bind(null, arbId, n.id, m.id)} submitLabel="اخترته" variant="gold"
+              confirmText="لا يمكن تغيير اختيارك بعد تسجيله. هل أنت متأكد؟" />
+          )}
+          {n.my_choice === m.id && <span className="hint">اخترتَه</span>}
+        </div>
+      ))}
+      {n.status === 'open' && (
+        <div className="space-y-2">
+          <p className="hint">
+            {n.i_chose ? 'سُجّل اختيارك.' : 'لم تختر بعد.'} {n.other_chose ? 'اختار الطرف الآخر (لا يظهر اختياره قبل أن تختار أنت).' : 'لم يختر الطرف الآخر بعد.'}
+          </p>
+          {!n.i_chose && (
+            <FormAction action={chooseNominee.bind(null, arbId, n.id, null)} submitLabel="لا أقبل أيًّا من المرشحين" variant="ghost"
+              confirmText="سيُعدّ هذا عدم اتفاق على القائمة. هل أنت متأكد؟" />
+          )}
+        </div>
+      )}
+      {decided && (
+        <p className="hint">اختيارك: <b>{nameOf(n.my_choice)}</b> · اختيار الطرف الآخر: <b>{nameOf(n.other_choice)}</b></p>
+      )}
+      {n.status === 'no_agreement' && (
+        <FormAction action={ackPlatformAppointment.bind(null, arbId, n.id)} submitLabel={n.i_acked ? 'وقّعتَ الإقرار' : 'أقرّ وأوافق على تفويض المنصة بالقرعة'} variant="gold"
+          className="space-y-3 border-t border-navy-100 pt-3" confirmText="هذا إقرار قانوني يُسجَّل باسمك وببصمة نصه. هل أنت متأكد؟">
+          <p className="text-sm leading-7">{n.ack_text}</p>
+          <p className="hint">{n.i_acked ? 'وقّعتَ الإقرار.' : 'لم توقّع بعد.'} {n.other_acked ? 'وقّع الطرف الآخر.' : 'لم يوقّع الطرف الآخر بعد.'} تُجرى القرعة فور توقيع الطرفين.</p>
+        </FormAction>
+      )}
+      {n.draw_seed && (
+        <details className="text-xs text-navy-500">
+          <summary className="cursor-pointer">تفاصيل القرعة (للتحقق)</summary>
+          <p className="mt-1">عدد المحكّمين المؤهلين: {n.eligible_count}. الترتيب بحسب md5(بذرة القرعة + معرّف المحكّم)، وأخذ أول خمسة.</p>
+          <p dir="ltr" className="break-all font-mono">{n.draw_seed}</p>
+          {n.platform_draw_seed && <p dir="ltr" className="break-all font-mono">{n.platform_draw_seed}</p>}
+        </details>
+      )}
+    </div>
   )
 }
 

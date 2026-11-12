@@ -164,3 +164,21 @@ export interface ArbAgreement {
   id: string; body: string; body_hash: string; version: number; status: 'draft' | 'open' | 'signed'
   opened_at: string | null; signed_at: string | null; platform_signature: string | null; signing_key_id: string | null
 }
+
+export type NominationState = {
+  id: string
+  round: number
+  status: 'open' | 'agreed' | 'no_agreement' | 'appointed' | 'cancelled'
+  eligible_count: number
+  requested_by_me: boolean
+  nominees: { id: string; name: string; bio: string | null; specializations: string[] | null; years_experience: number | null }[]
+  i_chose: boolean
+  other_chose: boolean
+  my_choice: string | null
+  other_choice: string | null
+  i_acked: boolean
+  other_acked: boolean
+  ack_text: string
+  draw_seed: string | null
+  platform_draw_seed: string | null
+}
