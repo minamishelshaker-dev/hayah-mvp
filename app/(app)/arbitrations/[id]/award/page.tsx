@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import PrintButton from '@/components/PrintButton'
-import { formatDate, formatEgp } from '@/lib/labels'
+import { formatDate, formatDisputeValue } from '@/lib/labels'
 import type { ArbAward, Arbitration } from '@/lib/types'
 import DocumentHeader from '@/components/DocumentHeader'
 
@@ -38,7 +38,7 @@ export default async function AwardPrintPage(props: { params: Promise<{ id: stri
         </header>
         <section className="text-sm">
           <p><b>مقدّم الطلب:</b> {name(arb.claimant_id)} — <b>الطرف الآخر:</b> {name(arb.respondent_id)}</p>
-          <p><b>المحكّم:</b> {name(arb.arbitrator_id)} — <b>قيمة النزاع:</b> {formatEgp(arb.dispute_value_egp)}</p>
+          <p><b>المحكّم:</b> {name(arb.arbitrator_id)} — <b>قيمة النزاع:</b> {formatDisputeValue(arb)}</p>
           {award.award_date && <p><b>تاريخ الحكم:</b> {award.award_date}</p>}
         </section>
         <div className="whitespace-pre-wrap">{award.draft_text}</div>

@@ -3,9 +3,9 @@ import HayahLogo from '@/components/HayahLogo'
 import { BRAND } from '@/lib/brand'
 
 const methods = [
-  { number: '01', title: 'التفاوض', text: 'مساحة منظمة لعرض وجهات النظر ومحاولة الوصول إلى حل ودي.' },
+  { number: '01', title: 'التفاوض', text: 'مساحة منظمة لعرض وجهات النظر ومحاولة الوصول إلى حل ودي.', soon: true },
   { number: '02', title: 'الوساطة', text: 'إدارة النزاع بمساعدة وسيط، مع توثيق الخطوات والاتفاقات داخل المنصة.' },
-  { number: '03', title: 'التوفيق', text: 'استكشاف مقترحات تسوية تساعد الأطراف على تقريب وجهات النظر.' },
+  { number: '03', title: 'التوفيق', text: 'استكشاف مقترحات تسوية تساعد الأطراف على تقريب وجهات النظر.', soon: true },
   { number: '04', title: 'التحكيم الاتفاقي', text: 'إدارة بعض إجراءات التحكيم عند وجود اتفاق بين الأطراف، وفق نطاق خدمات المنصة.' },
 ]
 
@@ -75,9 +75,13 @@ export default function Home() {
       </section>
 
       <section id="services" className="mx-auto max-w-7xl px-5 py-20 lg:px-8 lg:py-24">
-        <div className="mx-auto max-w-3xl text-center"><p className="font-extrabold text-[#0A1628]">خدمات المنصة</p><h2 className="mt-3 text-3xl font-extrabold leading-relaxed sm:text-4xl">خيارات متعددة لإدارة الخلافات</h2><p className="mt-3 leading-8 text-[#3A4C63]">تختلف الطريقة الأنسب بحسب طبيعة النزاع وموافقة الأطراف والإطار القانوني المنطبق.</p></div>
+        <div className="mx-auto max-w-3xl text-center"><p className="font-extrabold text-[#0A1628]">خدمات المنصة</p><h2 className="mt-3 text-3xl font-extrabold leading-relaxed sm:text-4xl">خيارات متعددة لإدارة الخلافات</h2><p className="mt-3 leading-8 text-[#3A4C63]">الإصدار الأول يتيح الوساطة والتحكيم. ويأتي التفاوض والتوفيق قريبًا في الإصدار الثاني.</p></div>
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {methods.map((m) => <article key={m.number} className="group rounded-2xl border border-[#E6EAF0] bg-white p-6 shadow-[0_4px_20px_rgba(10,22,40,0.05)] transition hover:-translate-y-1 hover:border-[#0A1628]/40 hover:shadow-[0_12px_32px_rgba(10,22,40,0.12)]"><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F5D06A] text-sm font-extrabold text-[#0A1628] transition group-hover:bg-[#0A1628] group-hover:text-white">{m.number}</span><h3 className="mt-5 text-xl font-extrabold">{m.title}</h3><p className="mt-3 text-sm leading-7 text-[#3A4C63]">{m.text}</p></article>)}
+          {methods.map((m) => <article key={m.number} className={`group rounded-2xl border border-[#E6EAF0] bg-white p-6 shadow-[0_4px_20px_rgba(10,22,40,0.05)] transition hover:-translate-y-1 hover:border-[#0A1628]/40 hover:shadow-[0_12px_32px_rgba(10,22,40,0.12)] ${m.soon ? 'opacity-70' : ''}`}><span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F5D06A] text-sm font-extrabold text-[#0A1628] transition group-hover:bg-[#0A1628] group-hover:text-white">{m.number}</span><h3 className="mt-5 text-xl font-extrabold">{m.title}</h3><p className="mt-3 text-sm leading-7 text-[#3A4C63]">{m.text}</p>{m.soon && <span className="mt-3 inline-block rounded-full bg-[#F6EBCB] px-3 py-1 text-xs font-bold text-[#8B6914]">الإصدار الثاني — قريبًا</span>}</article>)}
+        </div>
+        <div className="mx-auto mt-8 max-w-3xl space-y-2 rounded-2xl border border-[#E6EAF0] bg-white p-5 text-sm leading-7 text-[#3A4C63]">
+          <p><b className="text-[#0A1628]">نطاق الإصدار الأول:</b> منازعات تتراوح قيمتها بين 1,500 و50,000 دولار أمريكي أو ما يعادلها. يختار المستخدم عملة قيمة النزاع وعملة سداد الرسوم: الجنيه المصري، الدولار الأمريكي، الريال السعودي، الدرهم الإماراتي، الجنيه الإسترليني، اليورو. والدولار عملة معيارية داخل المنصة فقط.</p>
+          <p><b className="text-[#0A1628]">الذكاء الاصطناعي:</b> غير مفعّل في الإصدار الأول، ويتاح قريبًا في الإصدار الثاني. لا يُستخدم أي ذكاء اصطناعي في تحليل النزاعات أو اتخاذ القرارات.</p>
         </div>
       </section>
 

@@ -4,7 +4,7 @@ import CopyLink from '@/components/CopyLink'
 import ScheduleForm from '@/components/ScheduleForm'
 import UploadDocument from '@/components/UploadDocument'
 import DocumentActions from '@/components/DocumentActions'
-import { DOC_TYPE_LABEL, formatDate, formatEgp, formatSize } from '@/lib/labels'
+import { DOC_TYPE_LABEL, formatDate, formatDisputeValue, formatSize } from '@/lib/labels'
 import {
   mediatorRespond, partyRespond, proposeMediator, resendInvitation, saveSettlement,
   reopenSettlement, scheduleSession, signSettlement, submitSettlement,
@@ -177,7 +177,7 @@ function defaultSettlementText(d: Dispute, names: Names) {
 الطرف الأول (مقدّم النزاع): ${nm(names, d.claimant_id)}
 الطرف الثاني: ${nm(names, d.respondent_id)}
 الوسيط: ${nm(names, d.mediator_id)}
-قيمة النزاع محل الوساطة: ${formatEgp(d.dispute_value_egp)}
+قيمة النزاع محل الوساطة: ${formatDisputeValue(d)}
 
 أولًا: تمهيد
 نشأ بين الطرفين نزاع حول: ${d.title}. وقد اتفقا على عرضه على الوساطة بحضور الوسيط المذكور أعلاه، وانتهيا بعد جلسات الوساطة إلى التسوية الودية وفق البنود التالية.

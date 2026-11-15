@@ -103,6 +103,20 @@ export const formatDate = (iso: string) =>
 export const formatEgp = (n: number) =>
   `${Number(n).toLocaleString('ar-EG')} جنيه`
 
+export const CURRENCIES = ['EGP', 'USD', 'SAR', 'AED', 'GBP', 'EUR'] as const
+export const CURRENCY_LABEL: Record<string, string> = {
+  EGP: 'جنيه مصري', USD: 'دولار أمريكي', SAR: 'ريال سعودي', AED: 'درهم إماراتي', GBP: 'جنيه إسترليني', EUR: 'يورو',
+}
+export const formatMoney = (n: number, currency: string) =>
+  `${Number(n).toLocaleString('ar-EG', { maximumFractionDigits: 2 })} ${CURRENCY_LABEL[currency] ?? currency}`
+
+// The value of a dispute as the user stated it, with the standard USD equivalent. Files opened before the currencies existed fall back to EGP.
+export function formatDisputeValue(d: { dispute_value_egp: number; value_amount?: number | null; value_currency?: string | null; value_usd?: number | null }) {
+  if (d.value_amount == null || !d.value_currency) return formatEgp(d.dispute_value_egp)
+  const own = formatMoney(d.value_amount, d.value_currency)
+  return d.value_currency === 'USD' || d.value_usd == null ? own : `${own} (≈ ${formatMoney(d.value_usd, 'USD')})`
+}
+
 export const formatSize = (bytes: number) =>
   bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} ك.ب` : `${(bytes / 1024 / 1024).toFixed(1)} م.ب`
 

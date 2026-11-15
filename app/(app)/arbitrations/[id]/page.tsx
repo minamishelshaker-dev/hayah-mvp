@@ -8,6 +8,7 @@ import {
   ProcedurePanel, ProposedPanel, SelectionPanel, type Neutral,
 } from '@/components/arbitration/Panels'
 import type { ArbAgreement, ArbAssignment, ArbAward, ArbChallenge, ArbDocument, ArbHearing, ArbStep, ArbSubmission, Arbitration, NominationState, TimelineEntry } from '@/lib/types'
+import { formatDisputeValue } from '@/lib/labels'
 
 export default async function ArbitrationPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
@@ -84,7 +85,7 @@ export default async function ArbitrationPage(props: { params: Promise<{ id: str
   const beyondAgreement = ['selection', 'active', 'deliberation', 'closed'].includes(arb.status)
   const template = arbAgreementTemplate({
     arbNumber: arb.arb_number, claimant: names[arb.claimant_id] ?? '[اسم الطرف الأول]',
-    respondent: names[arb.respondent_id] ?? '[اسم الطرف الثاني]', valueEgp: arb.dispute_value_egp,
+    respondent: names[arb.respondent_id] ?? '[اسم الطرف الثاني]', valueText: formatDisputeValue(arb),
   })
 
   return (

@@ -24,9 +24,11 @@ const reasonOf = (fd: FormData) => text(fd, 'reason') || null
 // ------------------------------------------------------------------ escalation from a mediation file
 export async function proposeEscalation(disputeId: string, fd: FormData): Promise<ActionResult> {
   const value = Number(text(fd, 'value'))
+  const currency = text(fd, 'currency')
+  if (!['EGP', 'USD', 'SAR', 'AED', 'GBP', 'EUR'].includes(currency)) return { error: 'اختر عملة قيمة النزاع' }
   const { data, error } = await (await createClient()).rpc('propose_escalation', {
     p_dispute: disputeId, p_title: text(fd, 'title'), p_summary: text(fd, 'summary'),
-    p_value: Number.isFinite(value) ? value : 0, p_prior_clause: fd.get('prior_clause') === 'on',
+    p_value: Number.isFinite(value) ? value : 0, p_prior_clause: fd.get('prior_clause') === 'on', p_currency: currency,
   })
   if (error) return { error: error.message }
   await notifyArbitration(data as string, 'escalation_proposed', { roles: ['respondent'] })

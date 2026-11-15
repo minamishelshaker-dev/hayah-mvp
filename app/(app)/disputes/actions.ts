@@ -18,19 +18,17 @@ import { passwordIsValid } from '@/lib/reauth'
 import { checkUpload, discardObject } from '@/lib/upload-guard'
 import type { ActionResult } from '@/lib/types'
 
-// MVP market segment (a business rule, kept out of the database on purpose).
-const MIN_VALUE = 50_000
-const MAX_VALUE = 500_000
+// The first-release value band (1,500 to 50,000 USD) is enforced by the database; the form only shows it.
+const CURRENCY = z.enum(['EGP', 'USD', 'SAR', 'AED', 'GBP', 'EUR'])
 const MAX_FILE_BYTES = 10 * 1024 * 1024
 
 const disputeSchema = z.object({
   title: z.string().trim().min(5, 'عنوان النزاع قصير جدًا').max(200),
   description: z.string().trim().min(50, 'وصف النزاع يجب ألا يقل عن 50 حرفًا').max(10000),
   dispute_type: z.enum(['commercial', 'civil', 'labor', 'other']),
-  dispute_value_egp: z.coerce
-    .number()
-    .min(MIN_VALUE, `قيمة النزاع يجب ألا تقل عن ${MIN_VALUE.toLocaleString('ar-EG')} جنيه`)
-    .max(MAX_VALUE, `قيمة النزاع يجب ألا تتجاوز ${MAX_VALUE.toLocaleString('ar-EG')} جنيه في هذه النسخة`),
+  dispute_value: z.coerce.number().positive('قيمة النزاع غير صالحة'),
+  dispute_currency: CURRENCY,
+  fee_currency: CURRENCY,
   respondent_email: z.string().trim().email('البريد الإلكتروني للطرف الثاني غير صالح'),
   respondent_phone: z.string().trim().optional(),
 })
@@ -45,7 +43,9 @@ export async function createDispute(_prev: ActionResult, fd: FormData): Promise<
     p_title: v.title,
     p_description: v.description,
     p_type: v.dispute_type,
-    p_value: v.dispute_value_egp,
+    p_value: v.dispute_value,
+    p_currency: v.dispute_currency,
+    p_fee_currency: v.fee_currency,
     p_email: v.respondent_email,
     p_phone: v.respondent_phone ?? '',
   })

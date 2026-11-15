@@ -2,10 +2,12 @@ import Link from 'next/link'
 import FormAction from '@/components/FormAction'
 import { proposeEscalation } from '@/app/(app)/arbitrations/actions'
 import { ARB_STATUS_LABEL } from '@/lib/labels'
+import ValueFields from '@/components/dispute/ValueFields'
+import type { RateLite } from '@/lib/fees'
 import type { Dispute } from '@/lib/types'
 
-export default function EscalationPanel({ dispute, isParty, linked }: {
-  dispute: Dispute; isParty: boolean; linked: { id: string; arb_number: string; status: string }[]
+export default function EscalationPanel({ dispute, isParty, linked, rates }: {
+  dispute: Dispute; isParty: boolean; linked: { id: string; arb_number: string; status: string }[]; rates: (RateLite & { rate_date?: string })[]
 }) {
   const eligible = isParty && (['active', 'settlement_draft'].includes(dispute.status) || (dispute.status === 'closed' && dispute.outcome === 'no_settlement'))
   const hasOpen = linked.some((l) => l.status !== 'cancelled')
@@ -37,16 +39,12 @@ export default function EscalationPanel({ dispute, isParty, linked }: {
                 <label className="label" htmlFor="esc-summary">ملخص الطلب (30 حرفًا على الأقل)</label>
                 <textarea id="esc-summary" name="summary" required minLength={30} rows={5} className="input" />
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div>
-                  <label className="label" htmlFor="esc-value">قيمة النزاع (جنيه)</label>
-                  <input id="esc-value" name="value" type="number" required min={1} step="1" dir="ltr" defaultValue={dispute.dispute_value_egp} className="input" />
-                </div>
-                <label className="flex items-start gap-2 pt-6 text-sm">
-                  <input type="checkbox" name="prior_clause" className="mt-1.5" />
-                  <span>العقد يتضمن شرط تحكيم سابقًا (إقرار مني تسجّله المنصة ولا تحكم فيه)</span>
-                </label>
-              </div>
+              <ValueFields rates={rates} amountName="value" currencyName="currency" showFee={false} idPrefix="esc"
+                defaultCurrency={dispute.value_currency ?? 'EGP'} defaultAmount={dispute.value_amount ?? dispute.dispute_value_egp} />
+              <label className="flex items-start gap-2 text-sm">
+                <input type="checkbox" name="prior_clause" className="mt-1.5" />
+                <span>العقد يتضمن شرط تحكيم سابقًا (إقرار مني تسجّله المنصة ولا تحكم فيه)</span>
+              </label>
             </FormAction>
           </div>
         </details>

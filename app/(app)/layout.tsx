@@ -44,6 +44,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
                 <NavLink href="/admin/audit" currentPath={path}>سجل التدقيق</NavLink>
                 <NavLink href="/admin/metrics" currentPath={path}>المؤشرات</NavLink>
                 <NavLink href="/admin/legal" currentPath={path}>النصوص القانونية</NavLink>
+                <NavLink href="/admin/rates" currentPath={path}>أسعار الصرف</NavLink>
               </>
             )}
           </nav>

@@ -2,11 +2,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { requireProfile } from '@/lib/auth'
-import { STATUS_LABEL, STATUS_TONE, TYPE_LABEL, formatDate, formatEgp } from '@/lib/labels'
+import { STATUS_LABEL, STATUS_TONE, TYPE_LABEL, formatDate, formatDisputeValue } from '@/lib/labels'
 import Timeline from '@/components/dispute/Timeline'
 import AgreementGate from '@/components/dispute/AgreementGate'
 import Lifecycle, { EndedBanner, EndedNotice } from '@/components/dispute/Lifecycle'
 import EscalationPanel from '@/components/dispute/EscalationPanel'
+import FeeQuotePanel from '@/components/dispute/FeeQuotePanel'
 import {
   DocumentsPanel, InvitationPanel, MediatorPanel, SessionsPanel, SettlementPanel,
   nm, type MediatorOption, type Names,
@@ -87,6 +88,8 @@ export default async function DisputePage(props: { params: Promise<{ id: string 
   const step = STEP_INDEX[d.status] ?? 0
   const ended = ['closed', 'cancelled'].includes(d.status)
 
+  const { data: fxRows } = await supabase.from('fx_rates').select('currency, egp_per_unit, rate_date')
+  const rates = (fxRows ?? []).map((r) => ({ currency: r.currency as string, egp_per_unit: Number(r.egp_per_unit), rate_date: r.rate_date as string }))
   return (
     <div className="space-y-5">
       <header className="panel space-y-3">
@@ -102,7 +105,7 @@ export default async function DisputePage(props: { params: Promise<{ id: string 
         </div>
         <p className="whitespace-pre-wrap">{d.description}</p>
         <p className="hint">
-          {TYPE_LABEL[d.dispute_type]} — {formatEgp(d.dispute_value_egp)} — سُجّل في {formatDate(d.created_at)}
+          {TYPE_LABEL[d.dispute_type]} — {formatDisputeValue(d)} — سُجّل في {formatDate(d.created_at)}
         </p>
         <p className="text-sm">
           <span className="font-semibold">مقدّم النزاع:</span> {nm(names, d.claimant_id)}
@@ -144,7 +147,8 @@ export default async function DisputePage(props: { params: Promise<{ id: string 
         <SettlementPanel dispute={d} settlement={settlement} signatures={signatures} names={names} viewerId={profile.id} isMediator={isMediator} />
       )}
 
-      <EscalationPanel dispute={d} isParty={isParty} linked={linked} />
+      {isParty && <FeeQuotePanel valueUsd={d.value_usd} feeCurrency={d.fee_currency} rates={rates} />}
+      <EscalationPanel dispute={d} isParty={isParty} linked={linked} rates={rates} />
 
       <Lifecycle dispute={d} isParty={isParty} isMediator={isMediator} isAdmin={profile.role === 'admin'} settlementLocked={!!settlement && settlement.status !== 'draft'} />
 
