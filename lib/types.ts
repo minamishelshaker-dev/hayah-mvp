@@ -19,6 +19,13 @@ export interface Dispute {
   description: string
   dispute_type: 'commercial' | 'civil' | 'labor' | 'other'
   dispute_value_egp: number
+  value_amount?: number | null
+  value_currency?: string | null
+  value_usd?: number | null
+  fee_currency?: string | null
+  fx_egp_per_unit?: number | null
+  fx_egp_per_usd?: number | null
+  fx_rate_date?: string | null
   status: string
   created_by: string
   claimant_id: string
@@ -132,6 +139,13 @@ export interface Arbitration {
   title: string
   summary: string
   dispute_value_egp: number
+  value_amount?: number | null
+  value_currency?: string | null
+  value_usd?: number | null
+  fee_currency?: string | null
+  fx_egp_per_unit?: number | null
+  fx_egp_per_usd?: number | null
+  fx_rate_date?: string | null
   prior_clause: boolean
   status: 'proposed' | 'agreement' | 'selection' | 'active' | 'deliberation' | 'closed' | 'cancelled'
   claimant_id: string
@@ -182,3 +196,5 @@ export type NominationState = {
   draw_seed: string | null
   platform_draw_seed: string | null
 }
+
+export type FxRate = { currency: string; buy: number; sell: number; egp_per_unit: number; rate_date: string; source: string }

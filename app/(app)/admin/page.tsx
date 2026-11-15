@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { STATUS_LABEL, STATUS_TONE, formatDate, formatEgp } from '@/lib/labels'
+import { STATUS_LABEL, STATUS_TONE, formatDate, formatDisputeValue } from '@/lib/labels'
 import type { Dispute } from '@/lib/types'
 
 export default async function AdminDisputesPage() {
@@ -24,7 +24,7 @@ export default async function AdminDisputesPage() {
               <tr key={d.id} className="border-t border-navy-100">
                 <td className="p-3" dir="ltr"><Link className="font-semibold text-gold-700 underline" href={`/disputes/${d.id}`}>{d.dispute_number}</Link></td>
                 <td className="p-3">{d.title}</td>
-                <td className="p-3">{formatEgp(d.dispute_value_egp)}</td>
+                <td className="p-3">{formatDisputeValue(d)}</td>
                 <td className="p-3">{name(d.claimant_id)}</td>
                 <td className="p-3">{name(d.respondent_id)}</td>
                 <td className="p-3">{name(d.mediator_id)}</td>

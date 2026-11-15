@@ -1,7 +1,7 @@
 // A starting text for the arbitration agreement drafted on the platform. GUIDANCE ONLY: it must be reviewed by a lawyer
 // before real use, like the settlement template. Every [..] must be replaced; the database refuses to open the text for
 // signature while a bracket remains.
-export function arbAgreementTemplate(i: { arbNumber: string; claimant: string; respondent: string; valueEgp: number }): string {
+export function arbAgreementTemplate(i: { arbNumber: string; claimant: string; respondent: string; valueText: string }): string {
   return `اتفاق تحكيم
 
 رقم الملف على المنصة: ${i.arbNumber}
@@ -12,7 +12,7 @@ export function arbAgreementTemplate(i: { arbNumber: string; claimant: string; r
 
 ثانيًا: موضوع الاتفاق
 اتفق الطرفان على إحالة النزاع الآتي بينهما إلى التحكيم وفقًا لأحكام القانون رقم 27 لسنة 1994 في شأن التحكيم في المواد المدنية والتجارية: [وصف النزاع وسنده التعاقدي، مثل رقم العقد وتاريخه].
-القيمة التقديرية للنزاع: ${Number(i.valueEgp).toLocaleString('en-US')} جنيه مصري.
+القيمة التقديرية للنزاع: ${i.valueText}.
 
 ثالثًا: المحكّم
 يُحال النزاع إلى محكّم منفرد يتفق عليه الطرفان من دليل المحكّمين المعتمدين على منصة حياة. ولا يجوز أن يكون محكّمًا من عمل وسيطًا بين الطرفين في هذا النزاع.

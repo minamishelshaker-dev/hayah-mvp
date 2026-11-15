@@ -137,8 +137,8 @@ export default async function MetricsPage() {
         <h2 className="mb-3 text-lg">الحجم والقيمة</h2>
         <dl className="grid gap-3 sm:grid-cols-3">
           {([
-            ['قيمة النزاعات المسجّلة', formatEgp(m.value_total)],
-            ['قيمة النزاعات المسوّاة', formatEgp(m.value_settled)],
+            ['قيمة النزاعات المسجّلة (بالمعادل الجنيهي)', formatEgp(m.value_total)],
+            ['قيمة النزاعات المسوّاة (بالمعادل الجنيهي)', formatEgp(m.value_settled)],
             ['المستخدمون', num(m.users_total)],
             ['الجلسات', num(m.sessions_total)],
             ['متوسط الجلسات للنزاع المسوّى', m.sessions_per_settled == null ? '—' : num(Number(m.sessions_per_settled))],

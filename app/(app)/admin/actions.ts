@@ -92,3 +92,15 @@ export async function sendTestMail(_fd?: FormData): Promise<ActionResult> {
   if (!r.ok) return { error: `تعذّر الإرسال: ${r.reason}` }
   return { message: `أُرسلت رسالة اختبار إلى ${user.email} عبر ${r.via === 'smtp' ? 'SMTP' : 'Resend'} (المرسِل: ${d.from}). تحقق من الوارد ومن البريد المزعج.${d.restricted ? ' تنبيه: مرسِل Resend الحالي تجريبي ولا يسلّم إلا لبريد صاحب الحساب.' : ''}` }
 }
+
+// The five foreign rates (buy and sell, as published by the Central Bank of Egypt) are entered together; the platform adopts the average.
+export async function setFxRates(fd: FormData): Promise<ActionResult> {
+  const rates: Record<string, { buy: number; sell: number }> = {}
+  for (const c of ['USD', 'EUR', 'GBP', 'SAR', 'AED']) rates[c] = { buy: Number(fd.get(`${c}_buy`)), sell: Number(fd.get(`${c}_sell`)) }
+  const { error } = await (await createClient()).rpc('set_fx_rates', {
+    p_rates: rates, p_source: String(fd.get('source') ?? ''), p_date: String(fd.get('date') ?? ''),
+  })
+  if (error) return { error: error.message }
+  revalidatePath('/admin/rates')
+  return { message: 'حُدّثت أسعار الصرف المعتمدة. تُطبَّق على النزاعات الجديدة، وتبقى النزاعات القائمة بأسعار يومها.' }
+}

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { requireProfile } from '@/lib/auth'
-import { STATUS_LABEL, STATUS_TONE, TYPE_LABEL, formatDate, formatEgp } from '@/lib/labels'
+import { STATUS_LABEL, STATUS_TONE, TYPE_LABEL, formatDate, formatDisputeValue } from '@/lib/labels'
 import { ARB_STATUS_LABEL, ARB_STATUS_TONE } from '@/lib/labels'
 import type { Arbitration, Dispute } from '@/lib/types'
 
@@ -72,7 +72,7 @@ export default async function DashboardPage() {
                 <Link href={`/arbitrations/${a.id}`} className="panel flex flex-col justify-between gap-2 hover:border-gold sm:flex-row sm:items-center">
                   <div>
                     <p className="font-bold">{a.title}</p>
-                    <p className="hint"><span dir="ltr">{a.arb_number}</span> — {formatEgp(a.dispute_value_egp)} — {formatDate(a.created_at)}</p>
+                    <p className="hint"><span dir="ltr">{a.arb_number}</span> — {formatDisputeValue(a)} — {formatDate(a.created_at)}</p>
                   </div>
                   <span className={`badge ${ARB_STATUS_TONE[a.status]}`}>{ARB_STATUS_LABEL[a.status]}</span>
                 </Link>
@@ -98,7 +98,7 @@ export default async function DashboardPage() {
                 <div>
                   <p className="font-bold">{d.title}</p>
                   <p className="hint">
-                    <span dir="ltr">{d.dispute_number}</span> — {TYPE_LABEL[d.dispute_type]} — {formatEgp(d.dispute_value_egp)} — {formatDate(d.created_at)}
+                    <span dir="ltr">{d.dispute_number}</span> — {TYPE_LABEL[d.dispute_type]} — {formatDisputeValue(d)} — {formatDate(d.created_at)}
                   </p>
                 </div>
                 <span className={`badge ${STATUS_TONE[d.status]}`}>{STATUS_LABEL[d.status]}</span>

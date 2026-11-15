@@ -6,7 +6,7 @@ import UploadArbDocument from '@/components/arbitration/UploadArbDocument'
 import ArbDocumentActions from '@/components/arbitration/ArbDocumentActions'
 import {
   ARB_DOC_LABEL, ARB_OUTCOME_LABEL, ARB_STATUS_LABEL, ARB_STATUS_TONE, PARTY_LABEL, STEP_KIND_LABEL,
-  formatDate, formatEgp, formatSize,
+  formatDate, formatDisputeValue, formatSize,
 } from '@/lib/labels'
 import {
   acceptArbRules, arbitratorRespond, arbitratorWithdraw, closeProceedings, confirmArbAgreement, extendStep, issueAward,
@@ -97,7 +97,7 @@ export function ArbHeader({ arb, names, rulesAccepted }: { arb: Arbitration; nam
           <span className={`badge ${ARB_STATUS_TONE[arb.status]}`}>{ARB_STATUS_LABEL[arb.status]}</span>
         </div>
         <p className="whitespace-pre-wrap">{arb.summary}</p>
-        <p className="hint">{formatEgp(arb.dispute_value_egp)} — فُتح في {formatDate(arb.created_at)}</p>
+        <p className="hint">{formatDisputeValue(arb)} — فُتح في {formatDate(arb.created_at)}</p>
         <p className="text-sm">
           <span className="font-semibold">مقدّم الطلب:</span> {nm(names, arb.claimant_id)}{'  '}
           <span className="font-semibold">الطرف الآخر:</span> {nm(names, arb.respondent_id)}{'  '}

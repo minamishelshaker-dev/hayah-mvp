@@ -54,7 +54,7 @@ export default async function RecordViewPage(props: { params: Promise<{ id: stri
           <h2 className={H2}>بيانات النزاع</h2>
           <p className="font-bold">{r.dispute.title}</p>
           <p className="whitespace-pre-wrap">{r.dispute.description}</p>
-          <p className="hint">{TYPE_LABEL[r.dispute.type]} — {formatEgp(r.dispute.value_egp)} — الحالة وقت الإصدار: {STATUS_LABEL[r.dispute.status] ?? r.dispute.status} — سُجّل في {formatDate(r.dispute.created_at)}</p>
+          <p className="hint">{TYPE_LABEL[r.dispute.type]} — {formatEgp(r.dispute.value_egp)} (بالمعادل الجنيهي) — الحالة وقت الإصدار: {STATUS_LABEL[r.dispute.status] ?? r.dispute.status} — سُجّل في {formatDate(r.dispute.created_at)}</p>
           {r.dispute.outcome && <p className="font-semibold">نتيجة الملف: {OUTCOME_LABEL[r.dispute.outcome] ?? r.dispute.outcome}{r.dispute.outcome_reason ? ` — السبب المذكور: ${r.dispute.outcome_reason}` : ''}</p>}
           <p>مقدّم النزاع: {r.parties.claimant ?? '—'} — الطرف الثاني: {r.parties.respondent ?? '—'} — الوسيط: {r.parties.mediator ?? '—'}</p>
         </section>
