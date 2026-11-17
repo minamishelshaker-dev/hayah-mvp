@@ -3,24 +3,26 @@ import FormAction from '@/components/FormAction'
 import { publishLegal } from '../actions'
 import { formatDate } from '@/lib/labels'
 
-const KINDS = [
-  { kind: 'terms', label: 'شروط استخدام المنصة', note: 'تُطلب موافقة كل المستخدمين عليها من جديد فور نشر نسخة جديدة.' },
-  { kind: 'privacy', label: 'سياسة الخصوصية', note: 'تُطلب موافقة كل المستخدمين عليها من جديد فور نشر نسخة جديدة.' },
-  { kind: 'arbitration_rules', label: 'قواعد استخدام المنصة في التحكيم', note: 'تُثبَّت نسخة القواعد لكل ملف تحكيم عند فتحه، فلا يغيّرها نشر نسخة جديدة في ملف قائم.' },
-  { kind: 'mediation_agreement', label: 'اتفاقية الوساطة', note: 'تُطبَّق النسخة الجديدة على النزاعات الجديدة؛ من قبِل نسخة سابقة في نزاع قائم لا يُطلب منه القبول من جديد.' },
-]
+const NOTE: Record<string, string> = {
+  registration: 'وثيقة تُقبل عند التسجيل: تُطلب موافقة كل المستخدمين عليها من جديد فور نشر نسخة جديدة.',
+  public: 'سياسة منشورة للجميع: لا تُطلب موافقة، وتظهر النسخة الجديدة فور نشرها في صفحة الوثائق القانونية.',
+  dispute: 'تُطبَّق النسخة الجديدة على النزاعات الجديدة؛ من قبِل نسخة سابقة في نزاع قائم لا يُطلب منه القبول من جديد.',
+  arbitration: 'تُثبَّت نسخة القواعد لكل ملف تحكيم عند فتحه، فلا يغيّرها نشر نسخة جديدة في ملف قائم.',
+}
 
 type Doc = { id: string; kind: string; version: number; title: string; body: string; is_current: boolean; is_placeholder: boolean; created_at: string }
 
 export default async function AdminLegalPage() {
   const { data } = await (await createClient()).from('legal_documents').select('*').order('version', { ascending: false })
   const docs = (data ?? []) as Doc[]
+  const { data: kindRows } = await (await createClient()).from('legal_kinds').select('kind, scope, position, short_title').order('position')
+  const KINDS = (kindRows ?? []).map((k) => ({ kind: k.kind as string, label: k.short_title as string, note: NOTE[k.scope as string] ?? '' }))
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl">النصوص القانونية</h1>
-        <p className="hint">النصوص الحالية مؤقتة حتى تنشر نصوصك المعتمدة. كل نسخة محفوظة بختم SHA-256 ولا تُعدَّل، والنشر ينشئ نسخة جديدة.</p>
+        <p className="hint">كل نسخة محفوظة بختم SHA-256 ولا تُعدَّل، والنشر ينشئ نسخة جديدة.</p>
       </div>
       {KINDS.map(({ kind, label, note }) => {
         const versions = docs.filter((d) => d.kind === kind)

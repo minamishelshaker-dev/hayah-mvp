@@ -9,13 +9,17 @@ import { clientIp } from '@/lib/ratelimit'
 import { safeNext } from '@/lib/utils'
 import type { ActionResult } from '@/lib/types'
 
+// Registration documents are accepted ONE BY ONE. None of them is a consent to mediation or arbitration: each procedure has its own agreement.
 export async function acceptPlatformTerms(next: string, fd: FormData): Promise<ActionResult> {
-  if (fd.get('agree') !== 'on') return { error: 'يجب الموافقة على الشروط وسياسة الخصوصية للمتابعة' }
   const actor = await currentActor()
   if (!actor) return { error: 'غير مصرح' }
   const supabase = await createClient()
+  const { data: kinds } = await supabase.from('legal_kinds').select('kind').eq('scope', 'registration')
   const { data: docs } = await supabase
-    .from('legal_documents').select('id').eq('is_current', true).in('kind', ['terms', 'privacy'])
+    .from('legal_documents').select('id, kind, title').eq('is_current', true).in('kind', (kinds ?? []).map((k) => k.kind))
+  for (const doc of docs ?? []) {
+    if (fd.get(`agree_${doc.kind}`) !== 'on') return { error: `يجب الموافقة على: ${doc.title}` }
+  }
   const ua = (await headers()).get('user-agent')
   const ip = await clientIp()
   const admin = createAdminClient()

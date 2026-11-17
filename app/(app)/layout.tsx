@@ -60,7 +60,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <main className="app-main">{children}</main>
       <footer className="app-footer print:hidden">
         <div className="app-footer-inner">
-          <span>{BRAND.footerLine}</span>
+          <span>{BRAND.footerLine} · <Link href="/legal" className="underline">الوثائق القانونية</Link></span>
           <span>خصوصيتك وبياناتك محل اهتمامنا</span>
         </div>
       </footer>
