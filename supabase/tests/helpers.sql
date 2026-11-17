@@ -63,7 +63,7 @@ end $$;
 create function t.accept_platform() returns void language plpgsql as $$
 declare r record;
 begin
-  for r in select id from public.legal_documents where kind in ('terms', 'privacy') and is_current loop
+  for r in select l.id from public.legal_documents l join public.legal_kinds k on k.kind = l.kind where k.scope = 'registration' and l.is_current loop
     perform t.accept_legal(r.id, null, 'ip', 'ua');
   end loop;
 end $$;

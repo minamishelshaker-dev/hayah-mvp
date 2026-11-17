@@ -32,7 +32,6 @@ export async function verifyAuditChain(_fd?: FormData): Promise<ActionResult> {
 }
 
 export async function publishLegal(kind: string, fd: FormData): Promise<ActionResult> {
-  if (!['terms', 'privacy', 'mediation_agreement', 'arbitration_rules'].includes(kind)) return { error: 'نوع غير صالح' }
   const { data, error } = await (await createClient()).rpc('publish_legal_document', {
     p_kind: kind,
     p_title: String(fd.get('title') ?? ''),

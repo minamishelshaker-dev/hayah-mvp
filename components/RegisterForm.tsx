@@ -52,6 +52,7 @@ export default function RegisterForm({ next }: { next: string }) {
         )}
         {state.error && <p role="alert" className="auth-alert auth-alert-error">{state.error}</p>}
         {state.message && <p role="status" className="auth-alert auth-alert-success">{state.message}</p>}
+        <p className="hint text-sm">إنشاء الحساب لا يعني الموافقة على وساطة أو تحكيم. بعد الدخول تُطلب موافقتك على وثائق استخدام المنصة، وتُطلب موافقة مستقلة لكل إجراء عند فتح ملفه. اطّلع على <Link className="auth-text-link" href="/legal">الوثائق القانونية</Link> قبل التسجيل.</p>
         <SubmitButton label="إنشاء الحساب" className="btn btn-primary auth-submit w-full" />
         <p className="auth-switch">لديك حساب بالفعل؟ <Link className="auth-text-link" href={next ? `/login?next=${encodeURIComponent(next)}` : '/login'}>سجّل الدخول</Link></p>
       </form>

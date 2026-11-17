@@ -27,7 +27,7 @@ export default function AuthShell({ children, eyebrow, title, description }: { c
           </section>
         </div>
         <footer className="auth-footer">
-          <span>{BRAND.footerLine}</span>
+          <span>{BRAND.footerLine} · <Link href="/legal" className="underline">الوثائق القانونية</Link></span>
           <span>خصوصيتك وبياناتك محل اهتمامنا</span>
         </footer>
       </div>

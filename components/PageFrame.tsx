@@ -17,7 +17,7 @@ export default function PageFrame({ children, homeHref = '/', homeLabel = 'ال�
       </header>
       <main className="public-frame-main">{children}</main>
       <footer className="public-frame-footer">
-        <span>{BRAND.footerLine}</span>
+        <span>{BRAND.footerLine} · <Link href="/legal" className="underline">الوثائق القانونية</Link></span>
         <span>خصوصيتك وبياناتك محل اهتمامنا</span>
       </footer>
     </div>
